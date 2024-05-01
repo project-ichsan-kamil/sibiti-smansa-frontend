@@ -4,6 +4,8 @@ import {
 import Home from "./user/Home";
 import ErrorPage from "./components/ErrorPage";
 import Login from "./components/Login";
+import CmsTemplate from "./components/CmsTemplate";
+import Dashboard from "./admin/dashboard/Dashboard";
 
 const router = createBrowserRouter([
   {
@@ -14,8 +16,12 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
-    errorElement: <ErrorPage />,
   },
+  {
+    path: "/cms/dashboard",
+    element: <Dashboard/>,
+  },
+ 
 ]);
 
 export default router;
