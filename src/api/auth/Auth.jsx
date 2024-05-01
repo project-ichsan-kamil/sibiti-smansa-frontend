@@ -25,8 +25,10 @@ const login = async (email, password) => {
       if (role !== "GURU" && role !== "ADMIN") {
         throw new Error("Akun anda tidak terdaftar sebagai guru maupun admin");
       }
+
+      // const token = generateToken(user, role);
   
-      return { data: { user, role } };
+      return { data: { userId : user.id, role } };
     } catch (error) {
       console.error(error.message); // Log the error message for debugging
       return { error: error.message }; // Return the error message to the user

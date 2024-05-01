@@ -5,7 +5,7 @@ import Auth from '../api/auth/Auth';
 import Loading from './Loading';
 import Utils from '../utils/Utils';
 
-const SignUp = () => {
+const Login = () => {
     const { loading, showLoading, hideLoading } = Utils();
     const [data, setData] = useState({
         email: '',
@@ -51,17 +51,16 @@ const SignUp = () => {
 
     const submitForm = async (e) => {
         e.preventDefault();
-        showLoading();
         if (validateInput()) {
-            const {data : user, error} = await Auth.login(data.email.trim(), data.password);
-
+            showLoading();
+            const { data: user, error } = await Auth.login(data.email.trim(), data.password);
             if (error) {
                 message.error(error)
                 hideLoading();
             } else {
                 hideLoading();
-                // window.location.href = "/cms/dashboard";
-                console.log(user);
+                localStorage.setItem('token', JSON.stringify(user) )
+                window.location.href = "/cms/dashboard";
             }
         }
     };
@@ -112,9 +111,9 @@ const SignUp = () => {
                                         </div>
                                         <a href="#" className="text-sm font-medium text-primary-600 hover:underline">Forgot password?</a>
                                     </div>
-                                    <button 
-                                    onClick={(e) => submitForm(e)}
-                                    type="submit" className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Sign in</button>
+                                    <button
+                                        onClick={(e) => submitForm(e)}
+                                        type="submit" className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Sign in</button>
                                     <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                                         Don’t have an account yet? <a href="#" className="font-medium text-primary-600 hover:underline">Sign up</a>
                                     </p>
@@ -130,4 +129,4 @@ const SignUp = () => {
     );
 };
 
-export default SignUp;
+export default Login;
