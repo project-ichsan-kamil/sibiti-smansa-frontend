@@ -7,10 +7,10 @@ const CmsTemplate = ({ children }) => {
         <Fragment>
             <NavbarAdmin />
             <div className='grid grid-cols-12'>
-                <div className='col-span-2 h-[100vh] pt-5 border-r-2'>
+                <div className='col-span-2 pt-5 border-r-2'>
                     <Sidebar />
                 </div>
-                <div className='col-span-10 h-[100vh]'>
+                <div className='col-span-10'>
                     <div className='p-5'>
                         {children}
                     </div>

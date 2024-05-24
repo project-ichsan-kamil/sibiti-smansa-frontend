@@ -14,7 +14,7 @@ const Navbar = () => {
   );
 
   return (
-    <Header className="bg-purple-700 flex justify-between items-center">
+    <Header className="bg-purple-700 flex justify-between items-center w-full">
       <div>
         <h1 className='text-white text-2xl font-semibold'>Smansa</h1>
       </div>
