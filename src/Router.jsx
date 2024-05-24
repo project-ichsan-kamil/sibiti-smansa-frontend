@@ -7,6 +7,8 @@ import Login from "./components/Login";
 import CmsTemplate from "./components/CmsTemplate";
 import Dashboard from "./admin/dashboard/Dashboard";
 import Kelas from "./admin/kelas/Kelas";
+import Kuis from "./admin/ujian/kuis/Kuis";
+import FormKuis from "./admin/ujian/kuis/FormKuis";
 
 const router = createBrowserRouter([
   {
@@ -26,7 +28,14 @@ const router = createBrowserRouter([
     path: "/cms/kelas",
     element: <Kelas/>,
   },
- 
+  {
+    path: "/cms/kuis",
+    element: <Kuis/>,
+  },
+  {
+    path: "/cms/kuis/add",
+    element: <FormKuis/>,
+  },
 ]);
 
 export default router;
