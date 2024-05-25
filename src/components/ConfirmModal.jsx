@@ -1,12 +1,12 @@
 import React from 'react';
-import { ExclamationCircleFilled } from '@ant-design/icons';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 
 const ModalPopup = ({ title, onOk, onCancel, content }) => {
     const showConfirm = () => {
         Modal.confirm({
             title: title || 'Do you want to delete these items?',
-            icon: <ExclamationCircleFilled />,
+            icon: <QuestionCircleOutlined />,
             content: content || 'Some descriptions',
             onOk: onOk || (() => {}),
             onCancel: onCancel || (() => {}),
