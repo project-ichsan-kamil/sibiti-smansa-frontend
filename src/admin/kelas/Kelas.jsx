@@ -1,8 +1,7 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { Table, Select, Input, Button, Space, Modal, Form, message } from "antd";
+import { Table, Select, Input, Button, Space, Modal, Form } from "antd";
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import CmsTemplate from '../../components/CmsTemplate'
-import KelasService from "../../api/admin/KelasApi";
-import Utils from "../../utils/Utils";
 import Loading from "../../components/Loading"
 import ModalPopup from "../../components/ConfirmModal";
 import kelasHooks from "./hooks/kelasHooks";
@@ -55,7 +54,7 @@ const Kelas = () => {
             title: "Status",
             dataIndex: "status",
             key: "status",
-            width: "10%",
+            width: "5%",
             align: 'center',
             render: (status) => (
                 <p style={{ color: status === 'Aktif' ? 'green' : 'red' }}>
@@ -65,6 +64,7 @@ const Kelas = () => {
         },
         {
             title: "Action",
+            align: "center",
             key: "id",
             render: (text, record) => (
                 <Space size="small">
@@ -79,15 +79,15 @@ const Kelas = () => {
                             content: "Klik Ok untuk hapus data",
                         }).showConfirm()
                         }
+                        icon={<DeleteOutlined />}
                         danger
                     >
-                        Delete
                     </Button>
                     <Button
                         key={`edit-${record.id}`}
                         onClick={() => handleEdit(record.id)}
+                        icon={<EditOutlined />}
                     >
-                        Edit
                     </Button>
                 </Space>
             ),

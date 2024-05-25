@@ -24,7 +24,7 @@ const kelasHooks = (form, setKelasData) => {
         const { data, error } = await KelasService.deleteKelas(id);
         console.log(data);
         if (error) {
-            message.error(error.message);
+            message.error(error);
             hideLoading()
         } else {
             message.success("Berhasil hapus data")
@@ -74,7 +74,7 @@ const kelasHooks = (form, setKelasData) => {
             setKelasData(data);
             hideLoading()
         } else if (error) {
-            message.error(error.message);
+            message.error(error);
             hideLoading()
         }
     }
@@ -86,7 +86,7 @@ const kelasHooks = (form, setKelasData) => {
             setKelasData(data);
             hideLoading()
         } else if (error) {
-            message.error(error.message);
+            message.error(error);
             hideLoading()
         }
     };
