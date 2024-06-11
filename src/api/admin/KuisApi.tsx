@@ -136,11 +136,83 @@ const getAllSiswa = async (): Promise<{ data?: Siswa[]; error?: string }> => {
 
 const getAllKuis = async (): Promise<{data?: Kuis[]; error?: string}> => {
   try {
-    const { data, error } = await supabase
+    const { data : kuisData, error } = await supabase
       .from('ujian')
       .select('*')
       .eq('statusData', 1)
       .order('updatedDate', { ascending: false });
+
+    if (error) {
+      console.log(error);
+      throw new Error(error.message);
+    }
+
+    if (kuisData) {
+      for (const kuis of kuisData) {
+        kuis.peserta = convertToArray(kuis.peserta);
+        if (kuis.typePeserta === 1 && kuis.peserta) {
+          const { data: kelasData, error: kelasError } = await supabase
+            .from('kelas')
+            .select('id, nama')
+            .in('id', kuis.peserta)
+            .order("nama",  { ascending: true });
+            
+          if (kelasError) {
+            console.log(kelasError);
+            throw new Error(kelasError.message);
+          }
+
+          kuis.peserta = kelasData.map((kelas: Kelas) => kelas.nama);
+        } else if (kuis.typePeserta === 2 && kuis.peserta) {          
+          const { data: userData, error: userError } = await supabase
+            .from('profiles')
+            .select('id, userId, nama')
+            .in('userId', kuis.peserta);
+
+          if (userError) {
+            console.log(userError);
+            throw new Error(userError.message);
+          }
+
+          console.log(userData);
+          
+
+          kuis.peserta = userData.map((user: Siswa) => user.nama);
+        }
+      }
+    }
+
+    return { data : kuisData };
+  } catch (error: any) {
+    return { error: error.message };
+  }
+}
+
+const deleteKuis = async (id: any): Promise<{ data?: boolean; error?: string }> => {  //TODO check dlu apakah ini sudah ada yang ujian
+  try {
+    const { data , error } = await supabase
+      .from('ujian')
+      .update({ statusData: 2 })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating quiz status:', error);
+      throw new Error(error.message);
+    }
+
+    return { data: true };
+  } catch (error: any) {
+    return { error: error.message };
+  }
+}
+
+const getKuisById = async (id : any): Promise<{ data?: Siswa[]; error?: string }> => {
+  try {
+    const { data, error } = await supabase
+      .from('ujian')
+      .select('*')
+      .eq("id", id)
+      .single();
 
     if (error) {
       console.log(error);
@@ -153,12 +225,12 @@ const getAllKuis = async (): Promise<{data?: Kuis[]; error?: string}> => {
   }
 }
 
-
 const isExistingKuis = async (nama: string): Promise<boolean> => {
   try {
     const { data, error } = await supabase
       .from('ujian')
       .select('id')
+      .eq('statusData', 1)
       .eq('nama', nama);
 
     if (error) {
@@ -173,13 +245,22 @@ const isExistingKuis = async (nama: string): Promise<boolean> => {
   }
 }
 
+const convertToArray = (input: string): number[] => {
+  const cleanedString = input.replace(/[\[\]]/g, '');
+  const array = cleanedString.split(',');
+  const numberArray = array.map(item => Number(item.trim()));
+  return numberArray;
+};
+
 
 const KuisService = {
   getAllMataPelajaran,
   getAllSiswa,
   getAllKelas,
   addKuis,
-  getAllKuis
+  getAllKuis,
+  deleteKuis,
+  getKuisById
 };
 
 export default KuisService;

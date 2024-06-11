@@ -1,17 +1,27 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Form, Input, Button, Select, DatePicker, InputNumber } from 'antd';
+import { useParams } from 'react-router-dom';
+import moment from "moment";
 import CmsTemplate from '../../../components/CmsTemplate';
 import FormKuisHooks from './hooks/FormKuisHooks';
 import Loading from '../../../components/Loading';
 import ModalPopup from '../../../components/ConfirmModal';
 
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
+
+const dateFormat = 'YYYY-MM-DD HH:mm';
+
 const { Option } = Select;
 
 const CreateKuisForm = () => {
+    const { id } = useParams();
     const [form] = Form.useForm();
     const [tanggalMulai, setTanggalMulai] = useState(null);
     const [pesertaList, setPesertaList] = useState([])
-    const { getMataPelajaran, getKelasList, getAllSiswa, addKuis, mataPelajaranList, siswaList, kelasList, loading } = FormKuisHooks();
+    const { getMataPelajaran, getKelasList, getAllSiswa, addKuis, getKuisById, kuisById, mataPelajaranList, siswaList, kelasList, loading } = FormKuisHooks();
 
     const onFinish = (values) => {
         ModalPopup({
@@ -46,14 +56,77 @@ const CreateKuisForm = () => {
         form.setFieldValue("type", "1")
         
         //TODO get mata pelajaran guru yang login
+       
+        
+        dayjs.extend(customParseFormat);
         form.setFieldValue("mataPelajaranId", 10)
+        form.setFieldsValue({mulai : dayjs('2024-05-25 16:13:00', dateFormat)})
     }, [])
+
+    // useEffect(async ()  => {
+    //     var kuisDataById = await getKuisById(id)
+    //     form.setFieldValue(kuisDataById)
+    // }, [id])
+
+    // useEffect(() => {
+    //     // Fetch initial data
+    //     getMataPelajaran();
+    //     getKelasList();
+    //     getAllSiswa();
+    
+    //     if (id) {
+    //       // If there's an ID, fetch the existing quiz data
+    //       const fetchData = async () => {
+    //         const kuisDataById = await getKuisById(id);
+    //         if (kuisDataById) {
+    //           form.setFieldsValue({
+    //             ...kuisDataById,
+    //             mulai: moment(kuisDataById.mulai),
+    //             selesai: moment(kuisDataById.selesai)
+    //           });
+    //           setTanggalMulai(moment(kuisDataById.mulai));
+    //         }
+    //       };
+    //       fetchData();
+    //     }
+    //   }, [id]);
+
+    useEffect(() => {
+        // Fetch initial data
+        getMataPelajaran();
+        getKelasList();
+        getAllSiswa();
+    
+        if (id) {
+        //   // If there's an ID, fetch the existing quiz data
+          const fetchData = async () => {
+            const kuisDataById = await getKuisById(id);
+        //     if (kuisDataById) {
+        //       form.setFieldsValue({
+        //         ...kuisDataById,
+        //         durasi : String(kuisDataById.durasi),
+        //         mulai: moment(kuisDataById.mulai),
+        //         selesai: moment(kuisDataById.selesai),
+        //         type: String(kuisDataById.type), // Convert type to string if it's stored as integer
+        //         typePeserta: String(kuisDataById.typePeserta), // Convert typePeserta to string if it's stored as integer
+        //         // pesertaUjian: kuisDataById.pesertaUjian.map(p => p.userId || p.id) // Ensure the correct field is used for id
+        //       });
+        //     //   setTanggalMulai(moment(kuisDataById.mulai));
+        //     }
+          };
+          fetchData();
+          
+        }
+      }, [id]);
+    
 
 
     return (
         <Fragment>
             <CmsTemplate>
-                <h1 className="text-2xl font-semibold">Tambah Ujian</h1>
+                <h1 className="text-2xl font-semibold">
+                    {id ? 'Edit Ujian' : 'Tambah Ujian'}
+                </h1>
                 <Form form={form} layout="vertical" onFinish={onFinish} size='middle'>
                     <div style={{ width: "70%", display: 'flex', justifyContent: 'space-between' }}>
                         <div style={{ flex: 1, margin: '16px' }}>
@@ -99,7 +172,7 @@ const CreateKuisForm = () => {
                                     rules={[{ required: true, message: 'Pilih tanggal mulai!' }]}>
                                     <DatePicker
                                         className='w-full'
-                                        showTime={{ format: 'HH:mm' }}
+                                        showTime={{ format: 'YYYY-MM-DD HH:mm' }}
                                         format="YYYY-MM-DD HH:mm"
                                         placeholder="Pilih Tanggal Mulai"
                                         onChange={(value) => setTanggalMulai(value)}
@@ -208,8 +281,13 @@ const CreateKuisForm = () => {
                                         placeholder="Pilih Peserta Ujian"
                                         optionFilterProp="children"
                                     >
-                                          {pesertaList.map((value) => (
+                                          {/* {pesertaList.map((value) => (
                                             <Option key={value.id} value={value.id}>{value.nama}</Option>
+                                        ))} */}
+                                        {pesertaList.map((value) => (
+                                            <Option key={value.userId || value.id} value={value.userId || value.id}>
+                                            {value.nama}
+                                            </Option>
                                         ))}
                                     </Select>
                                 </Form.Item>

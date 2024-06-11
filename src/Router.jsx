@@ -36,6 +36,11 @@ const router = createBrowserRouter([
     path: "/cms/kuis/add",
     element: <FormKuis/>,
   },
+  {
+    path: "/cms/kuis/edit/:id",
+    element: <FormKuis/>,
+  },
+
 ]);
 
 export default router;

@@ -235,11 +235,11 @@ const items = [
       </Link>
     ),
   },
-  {
-    key: '/cms/ujian',
-    icon: <CalendarOutlined />,
-    label: 'Ujian',
-  },
+  // {
+  //   key: '/cms/ujian',
+  //   icon: <CalendarOutlined />,
+  //   label: 'Ujian',
+  // },
   {
     key: 'management-role',
     label: 'Management Role',

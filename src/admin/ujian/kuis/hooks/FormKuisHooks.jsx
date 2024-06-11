@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { message } from 'antd';
-// import KuisService from '../../../../api/admin/KuisApi'
 import KuisService from '../../../../api/admin/KuisApi';
 import Utils from '../../../../utils/Utils';
 
@@ -8,6 +7,7 @@ const FormKuisHooks = () => {
     const [mataPelajaranList, setMataPelajaranList] = useState([])
     const [kelasList, setKelasList] = useState([])
     const [siswaList, setSiswaList] = useState([])
+    const [kuisById, setKuisById] = useState({})
     const { showLoading, hideLoading, loading } = Utils()
 
     const addKuis = async (kuis) =>{
@@ -60,11 +60,26 @@ const FormKuisHooks = () => {
         }
     }
 
+    const getKuisById = async (id) => {
+        showLoading();
+        const { data, error } = await KuisService.getKuisById(id);
+        if (error) {
+            message.error(error);
+            hideLoading();
+        } else {
+            hideLoading()
+            console.log(data);
+            return data
+        }
+    };
+
   return {
     getMataPelajaran,
     getKelasList,
     getAllSiswa,
     addKuis,
+    getKuisById,
+    kuisById,
     siswaList,
     kelasList,
     mataPelajaranList,
