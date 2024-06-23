@@ -5,6 +5,7 @@ import CmsTemplate from '../../components/CmsTemplate'
 import Loading from "../../components/Loading"
 import ModalPopup from "../../components/ConfirmModal";
 import kelasHooks from "./hooks/kelasHooks";
+import { render } from "react-dom";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -34,6 +35,7 @@ const Kelas = () => {
             dataIndex: "id",
             key: "id",
             width: "3%",
+            align : "center",
             render: (text, record, index) => index + 1 + (currentPage - 1) * pageSize,
         },
         {
@@ -43,22 +45,22 @@ const Kelas = () => {
             width: "30%",
         },
         {
-            title: "Last Updated",
-            dataIndex: "updatedBy",
-            key: "updatedBy",
+            title: "Kelas",
+            dataIndex: "kelas",
+            key: "kelas",
             width: "10%",
-            align: 'center'
-
+            align: 'center',
+            render : (kelas) => `Kelas ${kelas}`
         },
         {
             title: "Status",
             dataIndex: "status",
             key: "status",
-            width: "5%",
+            width: "10%",
             align: 'center',
             render: (status) => (
-                <p style={{ color: status === 'Aktif' ? 'green' : 'red' }}>
-                    {status}
+                <p style={{ color: status === 1 ? 'green' : 'red' }}>
+                    {status === 1 ? "Aktif" : "Tidak Aktif"}
                 </p>
             )
         },
@@ -117,7 +119,12 @@ const Kelas = () => {
                             <Search
                                 placeholder="Cari kelas"
                                 allowClear
-                                onChange={(e) => searchKelas(e)}
+                                onChange={(e) => {
+                                    if (e.target.value === "") {
+                                        fetchData(); // Fetch all data when search input is cleared
+                                    }
+                                }}
+                                onSearch={(value) => searchKelas(value)}
                                 style={{ width: 200 }}
                             />
                         </div>
@@ -162,6 +169,17 @@ const Kelas = () => {
                                 <Input disabled={form.getFieldValue('id') ? true : false} />
                             </Form.Item>
                             <Form.Item
+                                name="kelas"
+                                label="Kelas"
+                                rules={[{ required: true, message: 'Pilih kelas' }]}
+                            >
+                                <Select optionLabelProp="label">
+                                    <Option value="Kelas 10">Kelas 10</Option>
+                                    <Option value="Kelas 11">Kelas 11</Option>
+                                    <Option value="Kelas 12">Kelas 12</Option>
+                                </Select>
+                            </Form.Item>
+                            <Form.Item
                                 name="status"
                                 label="Status"
                                 rules={[{ required: true, message: 'Pilih status kelas' }]}
@@ -183,5 +201,3 @@ const Kelas = () => {
 };
 
 export default Kelas;
-
-

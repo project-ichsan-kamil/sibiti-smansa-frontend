@@ -12,6 +12,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.42.7",
     "antd": "^5.16.4",
+    "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
     "dayjs": "^1.11.11",
     "dayjs-plugin-utc": "^0.1.2",
