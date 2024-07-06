@@ -310,14 +310,14 @@ const items = [
     label: 'Kelola Siswa',
   },
   {
-    key: 'link',
+    key: '/cms/tambah-user',
     icon: <LinkOutlined />,
     label: (
-      <a href="https://ant.design" target="_blank" rel="noopener noreferrer">
-        Ant Design
-      </a>
+      <Link to="/cms/tambah-user">
+        Tambah User
+      </Link>
     ),
-  },
+  }
 ];
 
 const Sidebar = () => {

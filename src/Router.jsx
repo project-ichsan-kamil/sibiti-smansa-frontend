@@ -9,6 +9,7 @@ import Dashboard from "./admin/dashboard/Dashboard";
 import Kelas from "./admin/kelas/Kelas";
 import Kuis from "./admin/ujian/kuis/Kuis";
 import FormKuis from "./admin/ujian/kuis/FormKuis";
+import CreateUser from "./admin/create-user/CreateUser";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
   {
     path: "/cms/kuis/edit/:id",
     element: <FormKuis/>,
+  },
+  {
+    path: "/cms/tambah-user",
+    element: <CreateUser/>,
   },
 
 ]);
