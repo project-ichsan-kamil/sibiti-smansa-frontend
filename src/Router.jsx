@@ -10,6 +10,7 @@ import Kelas from "./admin/kelas/Kelas";
 import Kuis from "./admin/ujian/kuis/Kuis";
 import FormKuis from "./admin/ujian/kuis/FormKuis";
 import CreateUser from "./admin/create-user/CreateUser";
+import ManagementAdmin from "./admin/management-role/ManagementAdmin";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
   {
     path: "/cms/tambah-user",
     element: <CreateUser/>,
+  },
+  {
+    path: "/cms/management-role/admin",
+    element: <ManagementAdmin/>,
   },
 
 ]);
