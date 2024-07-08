@@ -1,10 +1,25 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { Table, Select, Input, Button, Space, Modal, Form, notification } from "antd";
-import { DeleteOutlined, EditOutlined, CheckOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import CmsTemplate from '../../components/CmsTemplate';
+import {
+    Table,
+    Select,
+    Input,
+    Button,
+    Space,
+    Modal,
+    Form,
+    notification,
+} from "antd";
+import {
+    DeleteOutlined,
+    EditOutlined,
+    CheckOutlined,
+    EyeOutlined,
+    EyeInvisibleOutlined,
+} from "@ant-design/icons";
+import CmsTemplate from "../../components/CmsTemplate";
 import Loading from "../../components/Loading";
 import ModalPopup from "../../components/ConfirmModal";
-import axios from 'axios';
+import axios from "axios";
 import Utils from "../../utils/Utils";
 
 const { Option } = Select;
@@ -27,84 +42,85 @@ const CreateUser = () => {
 
     const fetchData = () => {
         showLoading();
-        axios.get(`${localUrl}/api/users/user-unverified`, getHeaders())
-        .then(response => {
-            const data = response.data.data;
-            setUserData(data);
-        })
-        .catch(e => {
-            console.log(e);
-            const error = e.response.data;
-            notification.error({message : error.message});
-        })
-        .finally(() => {
-            hideLoading();
-        });
+        axios
+            .get(`${localUrl}/api/users/user-unverified`, getHeaders())
+            .then((response) => {
+                const data = response.data.data;
+                setUserData(data);
+            })
+            .catch((e) => {
+                console.log(e);
+                const error = e.response.data;
+                notification.error({ message: error.message });
+            })
+            .finally(() => {
+                hideLoading();
+            });
     };
 
     const deleteData = (id) => {
         showLoading();
-        axios.delete(`${localUrl}/api/users/delete/${id}`, getHeaders())
-        .then(response => {
-            fetchData();
-            const res = response.data;
-            notification.success({ message: res.message });
-        })
-        .catch(e => {
-            console.log(e);
-            const error = e.response.data;
-            notification.error({message : error.message});
-        })
-        .finally(() => {
-            hideLoading();
-        });
+        axios
+            .delete(`${localUrl}/api/users/delete/${id}`, getHeaders())
+            .then((response) => {
+                fetchData();
+                const res = response.data;
+                notification.success({ message: res.message });
+            })
+            .catch((e) => {
+                console.log(e);
+                const error = e.response.data;
+                notification.error({ message: error.message });
+            })
+            .finally(() => {
+                hideLoading();
+            });
     };
 
     const handleEdit = (id) => {
         showLoading();
-        axios.get(`${localUrl}/api/users/get-user/${id}`, getHeaders())
-        .then(response => {
-            const user = response.data.data;
-            form.setFieldsValue({
-                id: user.id,
-                username: user.username,
-                password: user.profile.encrypt,
-                fullName: user.profile.fullName,
-                email: user.profile.email,
-                noHp: user.profile.noHp
+        axios
+            .get(`${localUrl}/api/users/get-user/${id}`, getHeaders())
+            .then((response) => {
+                const user = response.data.data;
+                form.setFieldsValue({
+                    id: user.id,
+                    username: user.username,
+                    password: user.profile.encrypt,
+                    fullName: user.profile.fullName,
+                    email: user.profile.email,
+                    noHp: user.profile.noHp
+                });
+                setEditMode(true);
+                setIsModalVisible(true);
+            })
+            .catch((e) => {
+                console.log(e);
+                const error = e.response.data;
+                notification.error({ message: error.message });
+            })
+            .finally(() => {
+                hideLoading();
             });
-            setEditMode(true);
-            setIsModalVisible(true);
-        })
-        .catch(e => {
-            console.log(e);
-            const error = e.response.data;
-            notification.error({message : error.message});
-        })
-        .finally(() => {
-            hideLoading();
-        });
     };
 
     const handleApprove = (id) => {
-        const token = localStorage.getItem('token');
-
         showLoading();
-        axios.put(`${localUrl}/api/users/approve/${id}`, {}, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-        .then(() => {
-            fetchData();
-            notification.success({ message: 'User approved successfully' });
-        })
-        .catch(error => {
-            console.error('There was an error approving the user!', error);
-        })
-        .finally(() => {
-            hideLoading();
-        });
+        axios
+            .post(`${localUrl}/api/users/verify/${id}`, {}, getHeaders())
+            .then((response) => {
+                fetchData();
+                const res = response.data;
+                notification.success({ message: res.message });
+            })
+            .catch((e) => {
+                console.log(e);
+                const error = e.response.data;
+                notification.error({ message: error.message });
+            })
+            .finally(() => {
+                hideLoading();
+            });
     };
 
     const searchUser = (value) => {
@@ -112,19 +128,20 @@ const CreateUser = () => {
             fetchData();
         } else {
             showLoading();
-            axios.get(`${localUrl}/api/users/search/${value}`, getHeaders())
-            .then(response => {
-                const data = response.data.data;
-                setUserData(data);
-            })
-            .catch(e => {
-                console.log(e);
-                const error = e.response.data;
-                notification.error({message : error.message});
-            })
-            .finally(() => {
-                hideLoading();
-            });
+            axios
+                .get(`${localUrl}/api/users/search/${value}`, getHeaders())
+                .then((response) => {
+                    const data = response.data.data;
+                    setUserData(data);
+                })
+                .catch((e) => {
+                    console.log(e);
+                    const error = e.response.data;
+                    notification.error({ message: error.message });
+                })
+                .finally(() => {
+                    hideLoading();
+                });
         }
     };
 
@@ -144,47 +161,53 @@ const CreateUser = () => {
             console.log(values);
             showLoading();
             if (editMode) {
-                axios.patch(`${localUrl}/api/users/profile-update/${values.id}`, values, getHeaders())
-                .then(response => {
-                    fetchData();
-                    const res = response.data;
-                    notification.success({ message: res.message });
-                })
-                .catch(e => {
-                    console.log(e);
-                    const error = e.response.data;
-                    notification.error({message: error.message});
-                })
-                .finally(() => {
-                    hideLoading();
-                    closeModal();
-                })
+                axios
+                    .patch(
+                        `${localUrl}/api/users/profile-update/${values.id}`,
+                        values,
+                        getHeaders()
+                    )
+                    .then((response) => {
+                        fetchData();
+                        const res = response.data;
+                        notification.success({ message: res.message });
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                        const error = e.response.data;
+                        notification.error({ message: error.message });
+                    })
+                    .finally(() => {
+                        hideLoading();
+                        closeModal();
+                    });
             } else {
-                axios.post(`${localUrl}/api/users/create`, values, getHeaders())
-                .then(response => {
-                    fetchData();
-                    const res = response.data;
-                    notification.success({ message: res.message });
-                })
-                .catch(e => {
-                    console.log(e);
-                    const error = e.response.data;
-                    notification.error({message: error.message});
-                })
-                .finally(() => {
-                    hideLoading();
-                    closeModal();
-                });
+                axios
+                    .post(`${localUrl}/api/users/create`, values, getHeaders())
+                    .then((response) => {
+                        fetchData();
+                        const res = response.data;
+                        notification.success({ message: res.message });
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                        const error = e.response.data;
+                        notification.error({ message: error.message });
+                    })
+                    .finally(() => {
+                        hideLoading();
+                        closeModal();
+                    });
             }
         } catch (error) {
-            console.error('Validation failed:', error);
+            console.error("Validation failed:", error);
         }
     };
 
     const togglePasswordVisibility = (id) => {
-        setPasswordVisible(prevState => ({
+        setPasswordVisible((prevState) => ({
             ...prevState,
-            [id]: !prevState[id]
+            [id]: !prevState[id],
         }));
     };
 
@@ -192,34 +215,41 @@ const CreateUser = () => {
         {
             title: "No",
             dataIndex: "id",
-            key: "id",
             width: "3%",
             align: "center",
-            render: (text, record, index) => index + 1 + (currentPage - 1) * pageSize,
+            render: (text, record, index) =>
+                index + 1 + (currentPage - 1) * pageSize,
         },
         {
             title: "Username",
             dataIndex: "username",
-            key: "username",
             width: "20%",
         },
         {
             title: "Nama Lengkap",
             dataIndex: ["profile", "fullName"],
-            key: "fullName",
             width: "20%",
-        },   
+        },
         {
             title: "Password",
             dataIndex: ["profile", "encrypt"],
-            key: "encrypt",
             width: "20%",
             render: (text, record) => (
                 <Space className="flex justify-between">
-                    <span>{passwordVisible[record.id] ? record.profile.encrypt : '●●●●●●●●●●●●●●●●●●●●●●●●'}</span>
+                    <span>
+                        {passwordVisible[record.id]
+                            ? record.profile.encrypt
+                            : "●●●●●●●●●●●●●●●●●●●●●●●●"}
+                    </span>
                     <Button
                         type="link"
-                        icon={passwordVisible[record.id] ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                        icon={
+                            passwordVisible[record.id] ? (
+                                <EyeInvisibleOutlined />
+                            ) : (
+                                <EyeOutlined />
+                            )
+                        }
                         onClick={() => togglePasswordVisibility(record.id)}
                     />
                 </Space>
@@ -228,47 +258,43 @@ const CreateUser = () => {
         {
             title: "Email",
             dataIndex: ["profile", "email"],
-            key: "email",
             width: "20%",
         },
         {
             title: "No HP",
             dataIndex: ["profile", "noHp"],
-            key: "noHp",
             width: "15%",
         },
         {
             title: "Action",
             align: "center",
-            key: "id",
             render: (text, record) => (
                 <Space size="small">
                     <Button
                         key={`delete-${record.id}`}
-                        onClick={() => ModalPopup({
-                            title: "Apakah anda ingin hapus pengguna ini?",
-                            onOk: () => {
-                                deleteData(record.id);
-                            },
-                            content: "Klik Ok untuk hapus data",
-                        }).showConfirm()}
+                        onClick={() =>
+                            ModalPopup({
+                                title: "Apakah anda ingin hapus pengguna ini?",
+                                onOk: () => {
+                                    deleteData(record.id);
+                                },
+                                content: "Klik Ok untuk hapus data",
+                            }).showConfirm()
+                        }
                         icon={<DeleteOutlined />}
                         danger
-                    >
-                    </Button>
+                    ></Button>
                     <Button
                         key={`edit-${record.id}`}
                         onClick={() => handleEdit(record.id)}
                         icon={<EditOutlined />}
-                    >
-                    </Button>
+                    ></Button>
                     <Button
                         key={`approve-${record.id}`}
                         onClick={() => handleApprove(record.id)}
                         icon={<CheckOutlined />}
                         type="primary"
-                    >
-                    </Button>
+                    ></Button>
                 </Space>
             ),
             width: "20%",
@@ -292,9 +318,11 @@ const CreateUser = () => {
                         </Select>
 
                         <div className="space-x-2">
-                            <Button type="primary" onClick={showModal}>Tambah</Button>
+                            <Button type="primary" onClick={showModal}>
+                                Tambah
+                            </Button>
                             <Search
-                                placeholder="Cari pengguna"
+                                placeholder="Cari User"
                                 allowClear
                                 onChange={(e) => {
                                     if (e.target.value === "") {
@@ -307,7 +335,7 @@ const CreateUser = () => {
                         </div>
                     </div>
 
-                    <Table
+                    <Table              //TODO add rowSelection
                         columns={columns}
                         dataSource={userData}
                         pagination={{
@@ -317,7 +345,8 @@ const CreateUser = () => {
                                 setCurrentPage(page);
                                 setPageSize(pageSize);
                             },
-                            showSizeChanger: false, position: ["bottomCenter"]
+                            showSizeChanger: false,
+                            position: ["bottomCenter"],
                         }}
                         size="small"
                     />
@@ -331,45 +360,66 @@ const CreateUser = () => {
                         cancelText="Batal"
                     >
                         <Form form={form} layout="vertical">
-                            <Form.Item
-                                name="id"
-                                label="id"
-                                hidden={true}
-                            >
+                            <Form.Item name="id" label="id" hidden={true}>
                                 <Input />
                             </Form.Item>
                             <Form.Item
                                 name="username"
                                 label="Username"
-                                rules={[{ required: true, message: 'Masukkan username' }]}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Masukkan username",
+                                    },
+                                ]}
                             >
                                 <Input disabled={editMode} />
                             </Form.Item>
                             <Form.Item
                                 name="password"
                                 label="Password"
-                                rules={[{ required: true, message: 'Masukkan password' }]}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Masukkan password",
+                                    },
+                                ]}
                             >
                                 <Input.Password />
                             </Form.Item>
                             <Form.Item
                                 name="fullName"
                                 label="Nama Lengkap"
-                                rules={[{ required: true, message: 'Masukkan Nama Lengkap' }]}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Masukkan Nama Lengkap",
+                                    },
+                                ]}
                             >
                                 <Input />
                             </Form.Item>
                             <Form.Item
                                 name="email"
                                 label="Email"
-                                rules={[{ required: true, message: 'Masukkan email' }]}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Masukkan email",
+                                    },
+                                ]}
                             >
                                 <Input />
                             </Form.Item>
                             <Form.Item
                                 name="noHp"
                                 label="No HP"
-                                rules={[{ required: true, message: 'Masukkan no hp pengguna' }]}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Masukkan no hp pengguna",
+                                    },
+                                ]}
                             >
                                 <Input />
                             </Form.Item>
@@ -384,5 +434,3 @@ const CreateUser = () => {
 };
 
 export default CreateUser;
-
-
