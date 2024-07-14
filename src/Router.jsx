@@ -11,6 +11,7 @@ import Kuis from "./admin/ujian/kuis/Kuis";
 import FormKuis from "./admin/ujian/kuis/FormKuis";
 import CreateUser from "./admin/create-user/CreateUser";
 import ManagementAdmin from "./admin/management-role/ManagementAdmin";
+import ManagementGuru from "./admin/management-role/ManagementGuru";
 
 const router = createBrowserRouter([
   {
@@ -49,6 +50,10 @@ const router = createBrowserRouter([
   {
     path: "/cms/management-role/admin",
     element: <ManagementAdmin/>,
+  },
+  {
+    path: "/cms/management-role/guru",
+    element: <ManagementGuru/>,
   },
 
 ]);
