@@ -12,6 +12,7 @@ import FormKuis from "./admin/ujian/kuis/FormKuis";
 import CreateUser from "./admin/create-user/CreateUser";
 import ManagementAdmin from "./admin/management-role/ManagementAdmin";
 import ManagementGuru from "./admin/management-role/ManagementGuru";
+import MataPelajaran from "./admin/mata-pelajaran/MataPelajaran";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
   {
     path: "/cms/management-role/guru",
     element: <ManagementGuru/>,
+  },
+  {
+    path: "/cms/mata-pelajaran",
+    element: <MataPelajaran/>,
   },
 
 ]);

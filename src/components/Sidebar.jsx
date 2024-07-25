@@ -83,7 +83,11 @@ const items = [
   {
     key: '/cms/mata-pelajaran',
     icon: <MailOutlined />,
-    label: 'Mata Pelajaran',
+    label: (
+      <Link to="/cms/mata-pelajaran">
+        Mata Pelajaran
+      </Link>
+    ),
   },
   {
     key: '/cms/kelas',
