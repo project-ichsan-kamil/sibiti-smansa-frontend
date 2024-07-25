@@ -13,11 +13,6 @@ const items = [
       </Link>
     ),
   },
-  // {
-  //   key: '/cms/ujian',
-  //   icon: <CalendarOutlined />,
-  //   label: 'Ujian',
-  // },
   {
     key: 'ujian',
     label: 'Ujian',
@@ -50,25 +45,6 @@ const items = [
     ],
   },
   {
-    key: '/cms/mata-pelajaran',
-    icon: <MailOutlined />,
-    label: 'Mata Pelajaran',
-  },
-  {
-    key: '/cms/kelas',
-    icon: <MailOutlined />,
-    label: (
-      <Link to="/cms/kelas">
-        Kelas
-      </Link>
-    ),
-  },
-  {
-    key: '/cms/kelola-siswa',
-    icon: <MailOutlined />,
-    label: 'Kelola Siswa',
-  },
-  {
     key: 'management-role',
     label: 'Management Role',
     icon: <AppstoreOutlined />,
@@ -98,6 +74,25 @@ const items = [
         ),
       },
     ],
+  },
+  {
+    key: '/cms/kelola-siswa',
+    icon: <MailOutlined />,
+    label: 'Kelola Siswa',
+  },
+  {
+    key: '/cms/mata-pelajaran',
+    icon: <MailOutlined />,
+    label: 'Mata Pelajaran',
+  },
+  {
+    key: '/cms/kelas',
+    icon: <MailOutlined />,
+    label: (
+      <Link to="/cms/kelas">
+        Kelas
+      </Link>
+    ),
   },
   {
     key: '/cms/tambah-user',

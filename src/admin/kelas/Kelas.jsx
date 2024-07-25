@@ -53,6 +53,13 @@ const Kelas = () => {
             render : (kelas) => `Kelas ${kelas}`
         },
         {
+            title: "Jumlah Siswa",
+            dataIndex: "jumlah_siswa",
+            key: "jumlah_siswa",
+            width: "10%",
+            align: 'center',
+        },
+        {
             title: "Status",
             dataIndex: "status",
             key: "status",
