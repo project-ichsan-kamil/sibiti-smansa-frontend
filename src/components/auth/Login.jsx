@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 import { message } from "antd";
-import Loading from "./Loading";
-import Utils from "../utils/Utils";
+import Loading from "../Loading";
+import Utils from "../../utils/Utils";
 import axios from "axios";
 
 const Login = () => {
@@ -58,7 +58,7 @@ const Login = () => {
                     const res = response.data;          //TODO check is admin or guru
                     if (res.statusCode === 200) {
                         message.success(res.message);
-                        localStorage.setItem("token", res.data.token);
+                        localStorage.setItem('token',  res.data.token);
                         window.location.href = "/cms/dashboard";
                     }
                 })
