@@ -1,8 +1,8 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { Table, Select, Input, Button, Space, Form, Tabs, Tag } from "antd";
 import { DeleteOutlined, EditOutlined, CheckCircleTwoTone, RocketOutlined } from '@ant-design/icons';
-import Loading from "../../../components/Loading"
-import CmsTemplate from '../../../components/CmsTemplate';
+import Loading from "../../../components/template/Loading"
+import CmsTemplate from '../../../components/template/CmsTemplate';
 import ModalPopup from "../../../components/ConfirmModal";
 import KuisHooks from "./hooks/KuisHooks";
 

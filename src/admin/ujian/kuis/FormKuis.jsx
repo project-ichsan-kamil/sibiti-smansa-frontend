@@ -2,9 +2,9 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Form, Input, Button, Select, DatePicker, InputNumber } from 'antd';
 import { useParams } from 'react-router-dom';
 import moment from "moment";
-import CmsTemplate from '../../../components/CmsTemplate';
+import CmsTemplate from '../../../components/template/CmsTemplate';
 import FormKuisHooks from './hooks/FormKuisHooks';
-import Loading from '../../../components/Loading';
+import Loading from '../../../components/template/Loading';
 import ModalPopup from '../../../components/ConfirmModal';
 
 import dayjs from 'dayjs';

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { Table, Select, Input, Button, Space, Modal, Form } from "antd";
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import CmsTemplate from '../../components/CmsTemplate';
-import Loading from "../../components/Loading";
+import CmsTemplate from '../../components/template/CmsTemplate';
+import Loading from "../../components/template/Loading";
 import ModalPopup from "../../components/ConfirmModal";
 import mataPelajaranHooks from "./hooks/mataPelajaranHooks";
 

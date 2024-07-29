@@ -8,7 +8,7 @@ import {
 } from "@ant-design/icons";
 import LineChart from "../../components/chart/LineChart";
 import BarChart from "../../components/chart/BarChart";
-import CmsTemplate from "../../components/CmsTemplate";
+import CmsTemplate from "../../components/template/CmsTemplate";
 
 const { Header, Content } = Layout;
 

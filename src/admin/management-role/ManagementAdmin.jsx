@@ -12,8 +12,8 @@ import {
 import {
     DeleteOutlined,
 } from "@ant-design/icons";
-import CmsTemplate from "../../components/CmsTemplate";
-import Loading from "../../components/Loading";
+import CmsTemplate from "../../components/template/CmsTemplate";
+import Loading from "../../components/template/Loading";
 import ModalPopup from "../../components/ConfirmModal";
 import axios from "axios";
 import Utils from "../../utils/Utils";

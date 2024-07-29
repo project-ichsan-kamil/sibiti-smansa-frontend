@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from "react";
 import { message } from "antd";
-import Loading from "../Loading";
+import Loading from "../template/Loading";
 import Utils from "../../utils/Utils";
 import axios from "axios";
 
