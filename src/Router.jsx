@@ -1,6 +1,4 @@
-import {
-  createBrowserRouter,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./user/Home";
 import ErrorPage from "./components/ErrorPage";
 import Login from "./components/auth/Login";
@@ -12,9 +10,10 @@ import CreateUser from "./admin/create-user/CreateUser";
 import ManagementAdmin from "./admin/management-role/ManagementAdmin";
 import ManagementGuru from "./admin/management-role/ManagementGuru";
 import MataPelajaran from "./admin/mata-pelajaran/MataPelajaran";
-import RequireAuth from "./components/auth/RequireAuth";
+import PrivateRoute from "./components/auth/PrivateRoute";
+import { Roles } from "./config/enum";
 
-const router = createBrowserRouter([
+const routes = [
   {
     path: "/",
     element: <Home />,
@@ -27,77 +26,77 @@ const router = createBrowserRouter([
   {
     path: "/cms/dashboard",
     element: (
-      <RequireAuth>
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN]}>
         <Dashboard />
-      </RequireAuth>
+      </PrivateRoute>
     ),
   },
   {
     path: "/cms/kelas",
     element: (
-      <RequireAuth>
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN]}>
         <Kelas />
-      </RequireAuth>
+      </PrivateRoute>
     ),
   },
   {
     path: "/cms/kuis",
     element: (
-      <RequireAuth>
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
         <Kuis />
-      </RequireAuth>
+      </PrivateRoute>
     ),
   },
   {
     path: "/cms/kuis/add",
     element: (
-      <RequireAuth>
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
         <FormKuis />
-      </RequireAuth>
+      </PrivateRoute>
     ),
   },
   {
     path: "/cms/kuis/edit/:id",
     element: (
-      <RequireAuth>
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
         <FormKuis />
-      </RequireAuth>
+      </PrivateRoute>
     ),
   },
   {
     path: "/cms/tambah-user",
     element: (
-      <RequireAuth>
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN]}>
         <CreateUser />
-      </RequireAuth>
+      </PrivateRoute>
     ),
   },
   {
     path: "/cms/management-role/admin",
     element: (
-      <RequireAuth>
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN]}>
         <ManagementAdmin />
-      </RequireAuth>
+      </PrivateRoute>
     ),
   },
   {
     path: "/cms/management-role/guru",
     element: (
-      <RequireAuth>
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN]}>
         <ManagementGuru />
-      </RequireAuth>
+      </PrivateRoute>
     ),
   },
   {
     path: "/cms/mata-pelajaran",
     element: (
-      <RequireAuth>
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN]}>
         <MataPelajaran />
-      </RequireAuth>
+      </PrivateRoute>
     ),
   },
-]);
+];
 
-export default router;
-
-
+export default function AppRouter() {
+  return <RouterProvider router={createBrowserRouter(routes)} />;
+}

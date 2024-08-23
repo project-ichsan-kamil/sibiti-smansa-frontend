@@ -1,192 +1,103 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import { message } from "antd";
 import Loading from "../template/Loading";
-import Utils from "../../utils/Utils";
-import axios from "axios";
+import api from "../../config/axios";
 
 const Login = () => {
-    const { loading, showLoading, hideLoading } = Utils();
-    const [data, setData] = useState({
-        username: "",
-        password: "",
-    });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState({ email: "", password: "" });
+  const [error, setError] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
 
-    const [error, setError] = useState({
-        username: "",
-        password: "",
-    });
+  useEffect(() => {
+    api.get("/auth/me")
+      .then(() => setIsAuthenticated(true))
+      .catch(() => setIsAuthenticated(false))
+      .finally(() => setIsLoading(false));
+  }, []);
 
-    const [showPassword, setShowPassword] = useState(false);
+  if (isAuthenticated) return <Navigate to="/cms/dashboard" replace />;
 
-    const onChangeInput = (e) => {
-        setData({
-            ...data,
-            [e.target.name]: e.target.value,
-        });
+  const validateInput = () => {
+    const newError = {};
+    if (!data.email.trim()) newError.email = "Email is required";
+    if (!data.password.trim()) newError.password = "Password is required";
+    setError(newError);
+    return Object.keys(newError).length === 0;
+  };
 
-        setError({
-            ...error,
-            [e.target.name]: "",
-        });
-    };
+  const submitForm = (e) => {
+    e.preventDefault();
+    if (!validateInput()) return;
+    setIsLoading(true);
 
-    const validateInput = () => {
-        let isValid = true;
-        const newError = {};
-        console.log(data.username);
-        if (data.username.trim() === "" || data.username.trim().length == 0) {
-            newError.username = "Email is required";
-            isValid = false;
-        }
-        if (data.password.trim() === "") {
-            newError.password = "Password is required";
-            isValid = false;
-        }
+    api.post("/auth/login", data)
+      .then((res) => {
+        message.success(res.data.message);
+        window.location.href = "/cms/dashboard";
+      })
+      .catch((err) => message.error(err.response?.data?.message || "Login failed"))
+      .finally(() => setIsLoading(false));
+  };
 
-        setError(newError);
-
-        return isValid;
-    };
-
-    const submitForm = (e) => {
-        e.preventDefault();
-        if (validateInput()) {
-            showLoading();
-            axios
-                .post("http://localhost:3001/api/auth/login", data)
-                .then((response) => {
-                    const res = response.data;          //TODO check is admin or guru
-                    if (res.statusCode === 200) {
-                        message.success(res.message);
-                        localStorage.setItem('token',  res.data.token);
-                        window.location.href = "/cms/dashboard";
-                    }
-                })
-                .catch((error) => {
-                    const err = error.response.data;
-                    console.log(err);
-                    message.error(err.message);
-                })
-                .finally(() => {
-                    hideLoading();
-                });
-        }
-    };
-
-    return (
-        <Fragment>
-            <section className="bg-gray-50">
-                <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                    <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0">
-                        <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-                            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-                                Sign in to your account
-                            </h1>
-                            <form onSubmit={submitForm}>
-                                <div className="space-y-4 md:space-y-6">
-                                    <div>
-                                        <label
-                                            htmlFor="username"
-                                            className="block mb-2 text-sm font-medium text-gray-900"
-                                        >
-                                            Username
-                                        </label>
-                                        <input
-                                            onChange={(e) => onChangeInput(e)}
-                                            type="text"
-                                            name="username"
-                                            id="username"
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
-                                            placeholder="username"
-                                        />
-                                        {error.username && (
-                                            <p className="text-red-500 text-xs">
-                                                {error.username}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <label
-                                            htmlFor="password"
-                                            className="block mb-2 text-sm font-medium text-gray-900"
-                                        >
-                                            Password
-                                        </label>
-                                        <input
-                                            onChange={(e) => onChangeInput(e)}
-                                            type={
-                                                showPassword
-                                                    ? "text"
-                                                    : "password"
-                                            }
-                                            name="password"
-                                            id="password"
-                                            placeholder="••••••••"
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
-                                        />
-                                        {error.password && (
-                                            <p className="text-red-500 text-xs">
-                                                {error.password}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-start">
-                                            <div className="flex items-center h-5">
-                                                <input
-                                                    onChange={() =>
-                                                        setShowPassword(
-                                                            !showPassword
-                                                        )
-                                                    }
-                                                    id="remember"
-                                                    aria-describedby="remember"
-                                                    type="checkbox"
-                                                    className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300"
-                                                />
-                                            </div>
-                                            <div className="ml-3 text-sm">
-                                                <label
-                                                    htmlFor="remember"
-                                                    className="text-gray-500 dark:text-gray-300"
-                                                >
-                                                    Show password
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <a
-                                            href="#"
-                                            className="text-sm font-medium text-primary-600 hover:underline"
-                                        >
-                                            Forgot password?
-                                        </a>
-                                    </div>
-                                    <button
-                                        onClick={(e) => submitForm(e)}
-                                        type="submit"
-                                        className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                                    >
-                                        Sign in
-                                    </button>
-                                    <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                                        Don’t have an account yet?{" "}
-                                        <a
-                                            href="#"
-                                            className="font-medium text-primary-600 hover:underline"
-                                        >
-                                            Sign up
-                                        </a>
-                                    </p>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+  return (
+    <Fragment>
+      <section className="bg-gray-50">
+        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+          <div className="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
+            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+              <h1 className="text-xl font-bold leading-tight text-gray-900 md:text-2xl">
+                Sign in to your account
+              </h1>
+              <form onSubmit={submitForm}>
+                <div className="space-y-4 md:space-y-6">
+                  <div>
+                    <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900">Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={data.email}
+                      onChange={(e) => setData({ ...data, email: e.target.value })}
+                      className="bg-gray-50 border border-gray-300 rounded-lg p-2.5 w-full"
+                    />
+                    {error.email && <p className="text-red-500 text-xs">{error.email}</p>}
+                  </div>
+                  <div>
+                    <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900">Password</label>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={data.password}
+                      onChange={(e) => setData({ ...data, password: e.target.value })}
+                      className="bg-gray-50 border border-gray-300 rounded-lg p-2.5 w-full"
+                    />
+                    {error.password && <p className="text-red-500 text-xs">{error.password}</p>}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-500">
+                      <input
+                        type="checkbox"
+                        onChange={() => setShowPassword(!showPassword)}
+                        className="mr-2"
+                      />
+                      Show password
+                    </label>
+                    <a href="#" className="text-sm font-medium text-primary-600 hover:underline">Forgot password?</a>
+                  </div>
+                  <button type="submit" className="w-full bg-blue-600 text-white rounded-lg px-5 py-2.5">
+                    Sign in
+                  </button>
                 </div>
-            </section>
-
-            {loading && <Loading />}
-        </Fragment>
-    );
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+      {isLoading && <Loading />}
+    </Fragment>
+  );
 };
 
 export default Login;
