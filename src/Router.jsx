@@ -98,7 +98,12 @@ const routes = [
   },
   {
     path: "/not-authorized",
-    element: <NotAuthorizedPage />,
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU, Roles.SISWA]}>
+        <NotAuthorizedPage />
+      </PrivateRoute>
+    ),
+    
   },
 ];
 

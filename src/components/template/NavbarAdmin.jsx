@@ -7,7 +7,7 @@ import { Roles } from '../../config/enum';
 
 const { Header } = Layout;
 
-const Navbar = () => {
+const NavbarAdmin = () => {
   const [userData, setUserData] = useState({ fullname: '', role: '' });
   const navigate = useNavigate();
 
@@ -94,5 +94,5 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default NavbarAdmin;
 
