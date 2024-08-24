@@ -65,7 +65,7 @@ const routes = [
     ),
   },
   {
-    path: "/cms/tambah-user",
+    path: "/cms/create-user",
     element: (
       <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN]}>
         <CreateUser />
