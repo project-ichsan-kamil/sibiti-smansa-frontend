@@ -23,17 +23,16 @@ const CreateUser = () => {
     const [pageSize, setPageSize] = useState(10);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState({});
-    const [editMode, setEditMode] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]); // State for selected row keys
 
     useEffect(() => {
         fetchData();
     }, []);
 
-    const fetchData = async () => {
+    const fetchData = async (name = "") => {
         showLoading();
         try {
-            const response = await api.get(`users/user-unverified`);
+            const response = await api.get(name ? `/users/search?fullName=${name}&isVerified=false` : `/users/user-unverified`);
             const dataWithKeys = response.data.data.map((item, index) => ({
                 ...item,
                 key: item.id || index, // Ensure each item has a unique key
@@ -41,7 +40,8 @@ const CreateUser = () => {
             setUserData(dataWithKeys);
         } catch (e) {
             notification.error({
-                message: e.response?.data?.message || "Failed to fetch data",
+                message: "Error",
+                description: e.response?.data?.message || "Failed to fetch data",
             });
         } finally {
             hideLoading();
@@ -51,15 +51,10 @@ const CreateUser = () => {
     const deleteData = async (id) => {
         showLoading();
         try {
-            // Sending delete request with query parameters
             const response = await api.delete(`/users/delete`, {
                 params: { userId: id },
             });
-
-            // Refresh the data after successful deletion
             fetchData();
-
-            // Show success notification
             notification.success({
                 message: "Deleted Successfully",
                 description:
@@ -67,7 +62,6 @@ const CreateUser = () => {
                     "The user has been successfully deleted.",
             });
         } catch (e) {
-            // Handle error and show appropriate error message
             notification.error({
                 message: "Deletion Failed",
                 description:
@@ -82,7 +76,6 @@ const CreateUser = () => {
     const handleApprove = async (userIds = null) => {
         showLoading();
         try {
-            // Use passed userIds if present, otherwise use selectedRowKeys for bulk approval
             const idsToApprove = userIds ? [userIds] : selectedRowKeys;
 
             if (idsToApprove.length === 0) {
@@ -223,7 +216,7 @@ const CreateUser = () => {
         <Fragment>
             <CmsTemplate>
                 <div>
-                    <h1 className="text-2xl font-semibold">Tambah User</h1>
+                    <h1 className="text-2xl font-semibold">Add User</h1>
                     <div className="flex w-full justify-between mt-6 mb-4">
                         <Select
                             defaultValue="10"
@@ -253,9 +246,9 @@ const CreateUser = () => {
                                 Tambah
                             </Button>
                             <Search
-                                placeholder="Cari User"
+                                placeholder="Search User"
                                 allowClear
-                                onSearch={fetchData}
+                                onSearch={(value) => fetchData(value)} // Call fetchData with search query
                                 style={{ width: 200 }}
                             />
                         </div>
