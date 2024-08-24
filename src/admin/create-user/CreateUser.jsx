@@ -1,13 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
-import {
-    Table,
-    Select,
-    Input,
-    Button,
-    Space,
-    Form,
-    notification,
-} from "antd";
+import { Table, Select, Input, Button, Space, Form, notification } from "antd";
 import {
     DeleteOutlined,
     CheckOutlined,
@@ -59,12 +51,28 @@ const CreateUser = () => {
     const deleteData = async (id) => {
         showLoading();
         try {
-            const response = await api.delete(`/users/delete/${id}`);
+            // Sending delete request with query parameters
+            const response = await api.delete(`/users/delete`, {
+                params: { userId: id },
+            });
+
+            // Refresh the data after successful deletion
             fetchData();
-            notification.success({ message: response.data.message });
+
+            // Show success notification
+            notification.success({
+                message: "Deleted Successfully",
+                description:
+                    response.data.message ||
+                    "The user has been successfully deleted.",
+            });
         } catch (e) {
+            // Handle error and show appropriate error message
             notification.error({
-                message: e.response?.data?.message || "Failed to delete user",
+                message: "Deletion Failed",
+                description:
+                    e.response?.data?.message ||
+                    "Failed to delete the user. Please try again or contact support.",
             });
         } finally {
             hideLoading();
@@ -187,14 +195,15 @@ const CreateUser = () => {
                     <Button
                         onClick={() =>
                             ModalPopup({
-                                title: "Apakah anda ingin hapus pengguna ini?",
+                                title: "Are you sure you want to delete this user?",
                                 onOk: () => deleteData(record.id),
-                                content: "Klik Ok untuk hapus data",
+                                content: "Click OK to confirm user deletion.",
                             }).showConfirm()
                         }
                         icon={<DeleteOutlined />}
                         danger
                     />
+
                     <Button
                         style={{
                             backgroundColor: "#4CAF50",
@@ -275,4 +284,3 @@ const CreateUser = () => {
 };
 
 export default CreateUser;
-
