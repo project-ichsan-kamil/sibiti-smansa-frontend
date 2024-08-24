@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../../config/axios";
 import { useNavigate } from "react-router-dom";
 import { message } from "antd";
+import { Roles } from "../../config/enum";
 
 const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -14,9 +15,9 @@ const useAuth = () => {
         setIsAuthenticated(true);
         const roles = userRes.data.roles;
         // Redirect based on role
-        if (roles.includes("SISWA")) {
+        if (roles.includes(Roles.SISWA)) {
           navigate("/dashboard", { replace: true });
-        } else if (roles.includes("ADMIN") || roles.includes("SUPER_ADMIN")) {
+        } else if (roles.includes(Roles.SUPER_ADMIN) || roles.includes(Roles.ADMIN) || roles.includes(Roles.GURU)) {
           navigate("/cms/dashboard", { replace: true });
         }
       })
@@ -28,9 +29,9 @@ const useAuth = () => {
     api.get("/auth/me")
       .then((userRes) => {
         const roles = userRes.data.roles;
-        if (roles.includes("SISWA")) {
+        if (roles.includes(Roles.SISWA)) {
           navigate("/dashboard", { replace: true });
-        } else if (roles.includes("ADMIN") || roles.includes("SUPER_ADMIN")) {
+        } else if (roles.includes(Roles.SUPER_ADMIN) || roles.includes(Roles.ADMIN) || roles.includes(Roles.GURU)) {
           navigate("/cms/dashboard", { replace: true });
         } else {
           message.error("Role tidak dikenali. Hubungi admin.");
