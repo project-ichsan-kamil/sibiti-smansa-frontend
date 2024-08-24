@@ -1,24 +1,18 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { message } from "antd";
+import { message, notification } from "antd";
 import Loading from "../template/Loading";
 import api from "../../config/axios";
+import useAuth from "./userAuth";
 
 const Login = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isAuthenticated, checkAuthRole } = useAuth(); // Gunakan custom hook
   const [data, setData] = useState({ email: "", password: "" });
   const [error, setError] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    api.get("/auth/me")
-      .then(() => setIsAuthenticated(true))
-      .catch(() => setIsAuthenticated(false))
-      .finally(() => setIsLoading(false));
-  }, []);
-
-  if (isAuthenticated) return <Navigate to="/cms/dashboard" replace />;
+  if (isAuthenticated) return <Navigate to="/cms/dashboard" replace />; // Arahkan jika sudah login
 
   const validateInput = () => {
     const newError = {};
@@ -31,14 +25,18 @@ const Login = () => {
   const submitForm = (e) => {
     e.preventDefault();
     if (!validateInput()) return;
-    setIsLoading(true);
 
+    setIsLoading(true);
     api.post("/auth/login", data)
-      .then((res) => {
-        message.success(res.data.message);
-        window.location.href = "/cms/dashboard";
+      .then(() => checkAuthRole()) // Cek role pengguna dan arahkan
+      .catch((err) => {
+        console.error("Error details:", err); 
+        const errorMessage = err.response?.data?.message || "Login failed. Please try again.";
+        notification.error({
+          message: 'Error',
+          description: errorMessage,
+        });
       })
-      .catch((err) => message.error(err.response?.data?.message || "Login failed"))
       .finally(() => setIsLoading(false));
   };
 

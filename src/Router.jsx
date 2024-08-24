@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./user/Home";
-import ErrorPage from "./components/ErrorPage";
+import ErrorPage from "./components/auth/ErrorPage";
 import Login from "./components/auth/Login";
 import Dashboard from "./admin/dashboard/Dashboard";
 import Kelas from "./admin/kelas/Kelas";
@@ -12,6 +12,7 @@ import ManagementGuru from "./admin/management-role/ManagementGuru";
 import MataPelajaran from "./admin/mata-pelajaran/MataPelajaran";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import { Roles } from "./config/enum";
+import NotAuthorizedPage from "./components/auth/NotAuthorizedPage ";
 
 const routes = [
   {
@@ -94,6 +95,10 @@ const routes = [
         <MataPelajaran />
       </PrivateRoute>
     ),
+  },
+  {
+    path: "/not-authorized",
+    element: <NotAuthorizedPage />,
   },
 ];
 
