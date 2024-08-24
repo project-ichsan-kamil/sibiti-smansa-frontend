@@ -29,10 +29,18 @@ const CreateUser = () => {
         fetchData();
     }, []);
 
-    const fetchData = async (name = "") => {
+    const fetchData = async (searchQuery = "") => {
         showLoading();
         try {
-            const response = await api.get(name ? `/users/search?fullName=${name}&isVerified=false` : `/users/user-unverified`);
+            let response;
+            if (searchQuery) {
+                response = await api.get(`/users/search`, {
+                    params: { fullName: searchQuery, isVerified: true }, // Add your additional params if needed
+                });
+            } else {
+                response = await api.get(`users/user-unverified`);
+            }
+
             const dataWithKeys = response.data.data.map((item, index) => ({
                 ...item,
                 key: item.id || index, // Ensure each item has a unique key
@@ -41,7 +49,8 @@ const CreateUser = () => {
         } catch (e) {
             notification.error({
                 message: "Error",
-                description: e.response?.data?.message || "Failed to fetch data",
+                description:
+                    e.response?.data?.message || "Failed to fetch data",
             });
         } finally {
             hideLoading();
@@ -248,7 +257,12 @@ const CreateUser = () => {
                             <Search
                                 placeholder="Search User"
                                 allowClear
-                                onSearch={(value) => fetchData(value)} // Call fetchData with search query
+                                onSearch={(value) => fetchData(value)} // Search when user presses Enter or clicks search button
+                                onChange={(e) => {
+                                    if (e.target.value === "") {
+                                        fetchData(); // Fetch all data when input is cleared
+                                    }
+                                }}
                                 style={{ width: 200 }}
                             />
                         </div>
