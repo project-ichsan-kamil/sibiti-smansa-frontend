@@ -1,5 +1,14 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { Table, Select, Input, Button, Space, Form, notification } from "antd";
+import {
+    Table,
+    Select,
+    Input,
+    Button,
+    Space,
+    Form,
+    notification,
+    Modal,
+} from "antd";
 import {
     DeleteOutlined,
     CheckOutlined,
@@ -24,9 +33,12 @@ const CreateUser = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState({});
     const [selectedRowKeys, setSelectedRowKeys] = useState([]); // State for selected row keys
+    const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false); // State for confirm modal
+    const [classOptions, setClassOptions] = useState([]); // State for class options
 
     useEffect(() => {
         fetchData();
+        fetchClassOptions(); // Fetch class options when component mounts
     }, []);
 
     const fetchData = async (searchQuery = "") => {
@@ -35,7 +47,7 @@ const CreateUser = () => {
             let response;
             if (searchQuery) {
                 response = await api.get(`/users/search`, {
-                    params: { fullName: searchQuery, isVerified: true }, // Add your additional params if needed
+                    params: { fullName: searchQuery, isVerified: true },
                 });
             } else {
                 response = await api.get(`users/user-unverified`);
@@ -43,7 +55,7 @@ const CreateUser = () => {
 
             const dataWithKeys = response.data.data.map((item, index) => ({
                 ...item,
-                key: item.id || index, // Ensure each item has a unique key
+                key: item.id || index,
             }));
             setUserData(dataWithKeys);
         } catch (e) {
@@ -54,6 +66,18 @@ const CreateUser = () => {
             });
         } finally {
             hideLoading();
+        }
+    };
+
+    const fetchClassOptions = async () => {
+        try {
+            const response = await api.get("/classes");
+            setClassOptions(response.data.data); // Assuming the response data is an array of classes
+        } catch (e) {
+            notification.error({
+                message: "Error",
+                description: "Failed to fetch class options.",
+            });
         }
     };
 
@@ -120,6 +144,40 @@ const CreateUser = () => {
         }
     };
 
+    const handleFormSubmit = async (values) => {
+        try {
+            showLoading();
+            const response = await api.post("/users/create", values);
+            notification.success({
+                message: "User Created Successfully",
+                description: response.data.message,
+            });
+            fetchData();
+        } catch (e) {
+            notification.error({
+                message: "Creation Failed",
+                description:
+                    e.response?.data?.message ||
+                    "An unexpected error occurred during user creation. Please try again.",
+            });
+        } finally {
+            hideLoading();
+        }
+    };
+
+    const handleSave = async () => {
+        // Show confirmation modal
+        setIsConfirmModalVisible(true);
+    };
+
+    const handleConfirmSave = () => {
+        form.validateFields().then((values) => {
+            handleFormSubmit(values);
+            setIsConfirmModalVisible(false); // Hide confirm modal after submission
+            setIsModalVisible(false); // Hide the add user modal after submission
+        });
+    };
+
     const togglePasswordVisibility = (id) => {
         setPasswordVisible((prevState) => ({
             ...prevState,
@@ -138,28 +196,28 @@ const CreateUser = () => {
         {
             title: "No",
             dataIndex: "id",
-            key: "id", // Ensure this matches your data
+            key: "id",
             width: "3%",
             align: "center",
             render: (text, record, index) =>
                 index + 1 + (currentPage - 1) * pageSize,
         },
         {
-            title: "Nama Lengkap",
+            title: "Full Name",
             dataIndex: ["profile", "fullName"],
-            key: "fullName", // Ensure this matches your data
+            key: "fullName",
             width: "20%",
         },
         {
             title: "Email",
             dataIndex: "email",
-            key: "email", // Ensure this matches your data
+            key: "email",
             width: "20%",
         },
         {
             title: "Password",
             dataIndex: ["profile", "encrypt"],
-            key: "password", // Ensure this matches your data
+            key: "password",
             width: "20%",
             render: (text, record) => (
                 <Space className="flex justify-between">
@@ -183,11 +241,18 @@ const CreateUser = () => {
             ),
         },
         {
-            title: "No HP",
+            title: "Phone Number",
             dataIndex: ["profile", "noHp"],
-            key: "noHp", // Ensure this matches your data
+            key: "noHp",
             width: "15%",
         },
+        {
+            title: "Class",
+            dataIndex: ["class", "name"],
+            key: "class",
+            width: "15%",
+            render: (text) => (text ? text : "-"),
+        },        
         {
             title: "Action",
             align: "center",
@@ -250,9 +315,12 @@ const CreateUser = () => {
                             </Button>
                             <Button
                                 type="primary"
-                                onClick={() => setIsModalVisible(true)}
+                                onClick={() => {
+                                    form.resetFields(); // Reset form fields when the modal is opened
+                                    setIsModalVisible(true); // Show modal on click
+                                }}
                             >
-                                Tambah
+                                Add
                             </Button>
                             <Search
                                 placeholder="Search User"
@@ -283,6 +351,96 @@ const CreateUser = () => {
                         }}
                         size="small"
                     />
+
+                    {/* Add User Modal */}
+                    <Modal
+                        title="Add New User"
+                        visible={isModalVisible}
+                        onCancel={() => setIsModalVisible(false)} // Close modal on cancel
+                        onOk={handleSave} // Show confirmation modal before saving
+                        okText="Save"
+                        cancelText="Cancel"
+                    >
+                        <Form form={form} layout="vertical">
+                            <Form.Item
+                                name="fullName"
+                                label="Full Name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please enter full name",
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                            <Form.Item
+                                name="email"
+                                label="Email"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please enter email",
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                            <Form.Item
+                                name="password"
+                                label="Password"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please enter password",
+                                    },
+                                ]}
+                            >
+                                <Input.Password />
+                            </Form.Item>
+                            <Form.Item
+                                name="noHp"
+                                label="Phone Number"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please enter phone number",
+                                    },
+                                    {
+                                        pattern: /^[0-9]+$/,
+                                        message:
+                                            "Phone number must contain only digits",
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                            <Form.Item name="class" label="Class">
+                                <Select placeholder="Select Class">
+                                    {classOptions.map((classItem) => (
+                                        <Option
+                                            key={classItem.id}
+                                            value={classItem.id}
+                                        >
+                                            {classItem.name}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+
+                    {/* Confirmation Modal */}
+                    <Modal
+                        title="Confirm Save"
+                        visible={isConfirmModalVisible}
+                        onOk={handleConfirmSave}
+                        onCancel={() => setIsConfirmModalVisible(false)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <p>Are you sure you want to save this user?</p>
+                    </Modal>
                 </div>
             </CmsTemplate>
             {loading && <Loading />}
