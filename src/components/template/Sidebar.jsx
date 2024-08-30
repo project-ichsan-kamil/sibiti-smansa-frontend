@@ -13,6 +13,9 @@ const Sidebar = () => {
   // Helper function to check if user has a specific role
   const hasRole = (role) => userRoles.includes(role);
 
+  // Helper function to check if user has any of the specified roles
+  const hasAnyRole = (roles) => roles.some((role) => userRoles.includes(role));
+
   useEffect(() => {
     // Fetch roles from the backend
     api.get('/auth/me')
@@ -47,16 +50,6 @@ const Sidebar = () => {
       ],
     },
     {
-      key: 'management-role',
-      label: 'Management Role',
-      icon: <AppstoreOutlined />,
-      children: [
-        { key: '/cms/management-role/admin', label: <Link to="/cms/management-role/admin">Admin</Link> },
-        { key: '/cms/management-role/guru', label: <Link to="/cms/management-role/guru">Guru</Link> },
-        { key: '/cms/management-role/wali-kelas', label: <Link to="/cms/management-role/wali-kelas">Wali Kelas</Link> },
-      ],
-    },
-    {
       key: '/cms/kelola-siswa',
       icon: <MailOutlined />,
       label: 'Kelola Siswa',
@@ -73,7 +66,25 @@ const Sidebar = () => {
     },
   ];
 
-  // Conditionally add items based on roles
+  // Conditionally add Management Role items based on roles
+  if (hasAnyRole([Roles.ADMIN, Roles.SUPER_ADMIN])) {
+    const managementRoleItems = [
+      { key: '/cms/management-role/guru', label: <Link to="/cms/management-role/guru">Guru</Link> },
+    ];
+
+    if (hasRole(Roles.SUPER_ADMIN)) {
+      managementRoleItems.unshift({ key: '/cms/management-role/admin', label: <Link to="/cms/management-role/admin">Admin</Link> });
+    }
+
+    baseItems.push({
+      key: 'management-role',
+      label: 'Management Role',
+      icon: <AppstoreOutlined />,
+      children: managementRoleItems,
+    });
+  }
+
+  // Conditionally add Create User item for SUPER_ADMIN
   if (hasRole(Roles.SUPER_ADMIN)) {
     baseItems.push({
       key: '/cms/create-user',

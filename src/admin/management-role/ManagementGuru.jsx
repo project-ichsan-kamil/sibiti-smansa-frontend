@@ -9,14 +9,13 @@ import {
     Form,
     notification,
 } from "antd";
-import {
-    DeleteOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined } from "@ant-design/icons";
 import CmsTemplate from "../../components/template/CmsTemplate";
 import Loading from "../../components/template/Loading";
 import ModalPopup from "../../components/ConfirmModal";
 import axios from "axios";
 import Utils from "../../utils/Utils";
+import api from "../../config/axios";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -38,74 +37,74 @@ const ManagementGuru = () => {
         fetchSubjects();
     }, []);
 
-    const fetchData = (role = "guru", name = "") => {
+    const fetchData = async (name = "") => {
         showLoading();
-        axios
-            .get(`${localUrl}/api/user-role/search?role=${role}&name=${name}`, getHeaders())
-            .then((response) => {
-                const data = response.data.data;
-                console.log(data);
-                setUserData(data);
-            })
-            .catch((e) => {
-                console.log(e);
-                const error = e.response.data;
-                notification.error({ message: error.message });
-            })
-            .finally(() => {
-                hideLoading();
+        try {
+            const response = await api.get(`/user-roles/list-guru?name=${name}`);
+            console.log(response.data.data);
+            setUserData(response.data.data);
+        } catch (e) {
+            console.log(e);
+            notification.error({
+                message: "Error",
+                description: e.response?.data?.message || "Failed to fetch data.",
             });
+        } finally {
+            hideLoading();
+        }
     };
 
-    const fetchUsers = () => {
-        axios
-            .get(`${localUrl}/api/users/user-verified`, getHeaders())
-            .then((response) => {
-                setUsers(response.data.data);
-            })
-            .catch((e) => {
-                console.log(e);
-                const error = e.response.data;
-                notification.error({ message: error.message });
+    const fetchUsers = async () => {
+        try {
+            const response = await api.get(`/users/unassigned-verified-users`);
+            setUsers(response.data.data);
+        } catch (e) {
+            console.log(e);
+            notification.error({
+                message: "Error",
+                description: e.response?.data?.message || "Failed to fetch users.",
             });
+        }
     };
 
-    const fetchSubjects = () => {
-        axios
-            .get(`${localUrl}/api/subjects`, getHeaders())
-            .then((response) => {
-                console.log(response.data.data);
-                setSubjects(response.data.data);
-            })
-            .catch((e) => {
-                console.log(e);
-                const error = e.response.data;
-                notification.error({ message: error.message });
+    const fetchSubjects = async () => {
+        try {
+            const response = await api.get(`/subjects`);
+            setSubjects(response.data.data);
+        } catch (e) {
+            console.log(e);
+            notification.error({
+                message: "Error",
+                description: e.response?.data?.message || "Failed to fetch subjects.",
             });
+        }
     };
 
-    const deleteData = (id) => {
-        console.log(id);
+    const deleteData = async (roleId) => {
         showLoading();
-        axios
-            .delete(`${localUrl}/api/user-role/${id}`, getHeaders())
-            .then((response) => {
-                fetchData();
-                const res = response.data;
-                notification.success({ message: res.message });
-            })
-            .catch((e) => {
-                console.log(e);
-                const error = e.response.data;
-                notification.error({ message: error.message });
-            })
-            .finally(() => {
-                hideLoading();
+        try {
+            const response = await api.delete(`/user-roles/guru`, {
+                params: { roleId },
             });
+            notification.success({
+                message: "Success",
+                description: response.data.message || "User deleted successfully.",
+            });
+            fetchData();
+        } catch (e) {
+            console.log(e);
+            notification.error({
+                message: "Error",
+                description: e.response?.data?.message || "Failed to delete user.",
+            });
+        } finally {
+            hideLoading();
+        }
     };
+    
 
     const showModal = () => {
-        form.setFieldsValue({ role: 'guru' }); // Set default role to guru
+        form.setFieldsValue({ role: "GURU" }); 
         setIsModalVisible(true);
     };
 
@@ -115,34 +114,38 @@ const ManagementGuru = () => {
     };
 
     const handleSubmit = async () => {
-        try {
-            const values = await form.validateFields();
-            console.log(values);
-            showLoading();
-                axios
-                    .post(`${localUrl}/api/user-role`, values, getHeaders())
-                    .then((response) => {
-                        fetchData();
-                        const res = response.data;
-                        notification.success({ message: res.message });
-                    })
-                    .catch((e) => {
-                        console.log(e);
-                        const error = e.response.data;
-                        notification.error({ message: error.message });
-                    })
-                    .finally(() => {
-                        hideLoading();
-                        closeModal();
-                    });
-            
-        } catch (error) {
-            console.error("Validation failed:", error);
+        const values = await form.validateFields();
+        if (values.userId && values.subjectId && values.role) {
+            try {
+                showLoading();
+                
+                const response = await api.post(`/user-roles/create`, {
+                    userId: Number(values.userId),
+                    subjectId: Number(values.subjectId),
+                    role: values.role
+                });
+    
+                notification.success({
+                    message: "Success",
+                    description: response.data.message || "User role assigned successfully.",
+                });
+    
+                fetchData();
+                closeModal();
+            } catch (e) {
+                console.log(e);
+                notification.error({
+                    message: "Error",
+                    description: e.response?.data?.message || "Failed to assign user role.",
+                });
+            } finally {
+                hideLoading();
+            }
         }
     };
-
+    
     const searchUser = (value) => {
-        fetchData("guru", value);
+        fetchData(value);
     };
 
     const columns = [
@@ -156,12 +159,12 @@ const ManagementGuru = () => {
         },
         {
             title: "Nama",
-            dataIndex: "fullname",
+            dataIndex: "fullName",
             width: "20%",
         },
         {
             title: "Mata Pelajaran",
-            dataIndex: "subjectName",
+            dataIndex: "subject",
             width: "20%",
         },
         {
@@ -174,15 +177,13 @@ const ManagementGuru = () => {
                         onClick={() =>
                             ModalPopup({
                                 title: "Apakah anda ingin hapus pengguna ini?",
-                                onOk: () => {
-                                    deleteData(record.id);
-                                },
+                                onOk: () => deleteData(record.id),
                                 content: "Klik Ok untuk hapus data",
                             }).showConfirm()
                         }
                         icon={<DeleteOutlined />}
                         danger
-                    ></Button>
+                    />
                 </Space>
             ),
             width: "20%",
@@ -210,7 +211,7 @@ const ManagementGuru = () => {
                                 Tambah Guru
                             </Button>
                             <Search
-                                placeholder="Cari user"
+                                placeholder="Cari Guru"
                                 allowClear
                                 onChange={(e) => {
                                     if (e.target.value === "") {
@@ -261,7 +262,7 @@ const ManagementGuru = () => {
                                 <Select placeholder="Pilih user">
                                     {users.map((user) => (
                                         <Option key={user.id} value={user.id}>
-                                            {user.profile.fullName}
+                                            {user.fullName}
                                         </Option>
                                     ))}
                                 </Select>
@@ -269,7 +270,7 @@ const ManagementGuru = () => {
                             <Form.Item
                                 name="role"
                                 label="Role"
-                                initialValue="guru"
+                                initialValue="GURU"
                                 rules={[
                                     {
                                         required: true,
@@ -278,7 +279,7 @@ const ManagementGuru = () => {
                                 ]}
                             >
                                 <Select disabled>
-                                    <Option value="guru">Guru</Option>
+                                    <Option value="GURU">Guru</Option>
                                 </Select>
                             </Form.Item>
                             <Form.Item
