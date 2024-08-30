@@ -7,63 +7,41 @@ import {
     Space,
     Modal,
     Form,
-    notification,
 } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import CmsTemplate from "../../components/template/CmsTemplate";
 import Loading from "../../components/template/Loading";
 import ModalPopup from "../../components/ConfirmModal";
-import axios from "axios";
 import Utils from "../../utils/Utils";
 import api from "../../config/axios";
+import { showErrorNotification, showSuccessNotification } from "../../components/template/Notification";
 
 const { Option } = Select;
 const { Search } = Input;
 
-const ManagementGuru = () => {
-    const [form] = Form.useForm();
-    const [userData, setUserData] = useState([]);
-    const { showLoading, hideLoading, loading, localUrl, getHeaders } = Utils();
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [users, setUsers] = useState([]);
-    const [subjects, setSubjects] = useState([]);
-
-    useEffect(() => {
-        fetchData();
-        fetchUsers();
-        fetchSubjects();
-    }, []);
-
+const useFetchData = (setUserData, showLoading, hideLoading) => {
     const fetchData = async (name = "") => {
         showLoading();
         try {
             const response = await api.get(`/user-roles/list-guru?name=${name}`);
-            console.log(response.data.data);
             setUserData(response.data.data);
         } catch (e) {
-            console.log(e);
-            notification.error({
-                message: "Error",
-                description: e.response?.data?.message || "Failed to fetch data.",
-            });
+            showErrorNotification(e, "Failed to fetch data.");
         } finally {
             hideLoading();
         }
     };
 
+    return { fetchData };
+};
+
+const useFetchOptions = (setUsers, setSubjects) => {
     const fetchUsers = async () => {
         try {
             const response = await api.get(`/users/unassigned-verified-users`);
             setUsers(response.data.data);
         } catch (e) {
-            console.log(e);
-            notification.error({
-                message: "Error",
-                description: e.response?.data?.message || "Failed to fetch users.",
-            });
+            showErrorNotification(e, "Failed to fetch users.");
         }
     };
 
@@ -72,80 +50,76 @@ const ManagementGuru = () => {
             const response = await api.get(`/subjects`);
             setSubjects(response.data.data);
         } catch (e) {
-            console.log(e);
-            notification.error({
-                message: "Error",
-                description: e.response?.data?.message || "Failed to fetch subjects.",
-            });
+            showErrorNotification(e, "Failed to fetch subjects.");
         }
     };
 
-    const deleteData = async (roleId) => {
+    return { fetchUsers, fetchSubjects };
+};
+
+const ManagementGuru = () => {
+    const [form] = Form.useForm();
+    const [userData, setUserData] = useState([]);
+    const { showLoading, hideLoading, loading } = Utils();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [users, setUsers] = useState([]);
+    const [subjects, setSubjects] = useState([]);
+
+    const { fetchData } = useFetchData(setUserData, showLoading, hideLoading);
+    const { fetchUsers, fetchSubjects } = useFetchOptions(setUsers, setSubjects);
+
+    useEffect(() => {
+        fetchData();
+        fetchUsers();
+        fetchSubjects();
+    }, []);
+
+    const handleDelete = async (roleId) => {
         showLoading();
         try {
             const response = await api.delete(`/user-roles/guru`, {
                 params: { roleId },
             });
-            notification.success({
-                message: "Success",
-                description: response.data.message || "User deleted successfully.",
-            });
+            showSuccessNotification("Success", response.data.message || "User deleted successfully.");
             fetchData();
         } catch (e) {
-            console.log(e);
-            notification.error({
-                message: "Error",
-                description: e.response?.data?.message || "Failed to delete user.",
-            });
+            showErrorNotification(e, "Failed to delete user.");
         } finally {
             hideLoading();
         }
     };
-    
+
+    const handleModalSubmit = async () => {
+        const values = await form.validateFields();
+        if (values.userId && values.subjectId && values.role) {
+            try {
+                showLoading();
+                const response = await api.post(`/user-roles/create`, {
+                    userId: Number(values.userId),
+                    subjectId: Number(values.subjectId),
+                    role: values.role,
+                });
+                showSuccessNotification("Success", response.data.message || "User role assigned successfully.");
+                fetchData();
+                closeModal();
+            } catch (e) {
+                showErrorNotification(e, "Failed to assign user role.");
+            } finally {
+                hideLoading();
+            }
+        }
+    };
 
     const showModal = () => {
-        form.setFieldsValue({ role: "GURU" }); 
+        form.setFieldsValue({ role: "GURU" });
         setIsModalVisible(true);
     };
 
     const closeModal = () => {
         setIsModalVisible(false);
         form.resetFields();
-    };
-
-    const handleSubmit = async () => {
-        const values = await form.validateFields();
-        if (values.userId && values.subjectId && values.role) {
-            try {
-                showLoading();
-                
-                const response = await api.post(`/user-roles/create`, {
-                    userId: Number(values.userId),
-                    subjectId: Number(values.subjectId),
-                    role: values.role
-                });
-    
-                notification.success({
-                    message: "Success",
-                    description: response.data.message || "User role assigned successfully.",
-                });
-    
-                fetchData();
-                closeModal();
-            } catch (e) {
-                console.log(e);
-                notification.error({
-                    message: "Error",
-                    description: e.response?.data?.message || "Failed to assign user role.",
-                });
-            } finally {
-                hideLoading();
-            }
-        }
-    };
-    
-    const searchUser = (value) => {
-        fetchData(value);
     };
 
     const columns = [
@@ -177,7 +151,7 @@ const ManagementGuru = () => {
                         onClick={() =>
                             ModalPopup({
                                 title: "Apakah anda ingin hapus pengguna ini?",
-                                onOk: () => deleteData(record.id),
+                                onOk: () => handleDelete(record.id),
                                 content: "Klik Ok untuk hapus data",
                             }).showConfirm()
                         }
@@ -218,7 +192,7 @@ const ManagementGuru = () => {
                                         fetchData();
                                     }
                                 }}
-                                onSearch={(value) => searchUser(value)}
+                                onSearch={fetchData}
                                 style={{ width: 200 }}
                             />
                         </div>
@@ -243,7 +217,7 @@ const ManagementGuru = () => {
                     <Modal
                         title={"Tambah Guru"}
                         visible={isModalVisible}
-                        onOk={handleSubmit}
+                        onOk={handleModalSubmit}
                         onCancel={closeModal}
                         okText="Simpan"
                         cancelText="Batal"
