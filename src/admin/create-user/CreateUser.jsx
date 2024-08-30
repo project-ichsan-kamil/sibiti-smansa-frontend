@@ -8,12 +8,15 @@ import {
     Form,
     notification,
     Modal,
+    Upload,
 } from "antd";
 import {
     DeleteOutlined,
     CheckOutlined,
     EyeOutlined,
     EyeInvisibleOutlined,
+    DownloadOutlined,
+    UploadOutlined,
 } from "@ant-design/icons";
 import CmsTemplate from "../../components/template/CmsTemplate";
 import Loading from "../../components/template/Loading";
@@ -32,13 +35,13 @@ const CreateUser = () => {
     const [pageSize, setPageSize] = useState(10);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState({});
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]); // State for selected row keys
-    const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false); // State for confirm modal
-    const [classOptions, setClassOptions] = useState([]); // State for class options
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
+    const [classOptions, setClassOptions] = useState([]);
 
     useEffect(() => {
         fetchData();
-        fetchClassOptions(); // Fetch class options when component mounts
+        fetchClassOptions();
     }, []);
 
     const fetchData = async (searchQuery = "") => {
@@ -72,7 +75,7 @@ const CreateUser = () => {
     const fetchClassOptions = async () => {
         try {
             const response = await api.get("/classes");
-            setClassOptions(response.data.data); // Assuming the response data is an array of classes
+            setClassOptions(response.data.data);
         } catch (e) {
             notification.error({
                 message: "Error",
@@ -166,15 +169,14 @@ const CreateUser = () => {
     };
 
     const handleSave = async () => {
-        // Show confirmation modal
         setIsConfirmModalVisible(true);
     };
 
     const handleConfirmSave = () => {
         form.validateFields().then((values) => {
             handleFormSubmit(values);
-            setIsConfirmModalVisible(false); // Hide confirm modal after submission
-            setIsModalVisible(false); // Hide the add user modal after submission
+            setIsConfirmModalVisible(false);
+            setIsModalVisible(false);
         });
     };
 
@@ -185,10 +187,77 @@ const CreateUser = () => {
         }));
     };
 
+    const handleDownloadTemplate = async () => {
+        showLoading();
+        try {
+            const response = await api.get(
+                "/excel/generate-template-create-user",
+                {
+                    responseType: "blob", // Set response type to blob for file download
+                }
+            );
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "Users_Template.xlsx"); // Define file name
+            document.body.appendChild(link);
+            link.click();
+        } catch (e) {
+            notification.error({
+                message: "Download Failed",
+                description:
+                    e.response?.data?.message || "Failed to download template.",
+            });
+        } finally {
+            hideLoading();
+        }
+    };
+
+    const handleUploadTemplate = async (options) => {
+        const { file } = options;
+
+        if (!file) {
+            console.error("No file found in upload request");
+            notification.error({
+                message: "No File Provided",
+                description: "Please select a file to upload.",
+            });
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        showLoading();
+        try {
+            const response = await api.post("/users/upload-excel", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            notification.success({
+                message: "Upload Successful",
+                description: response.data.message,
+            });
+            fetchData(); // Refresh user data after successful upload
+        } catch (e) {
+            console.error("Upload error:", e);
+            notification.error({
+                message: "Upload Failed",
+                description:
+                    e.response?.data?.message ||
+                    "Failed to upload template. Please try again.",
+            });
+        } finally {
+            hideLoading();
+            fetchData(); 
+        }
+    };
+
     const rowSelection = {
         selectedRowKeys,
         onChange: (newSelectedRowKeys) => {
-            setSelectedRowKeys(newSelectedRowKeys); // Update selected row keys correctly
+            setSelectedRowKeys(newSelectedRowKeys);
         },
     };
 
@@ -252,7 +321,7 @@ const CreateUser = () => {
             key: "class",
             width: "15%",
             render: (text) => (text ? text : "-"),
-        },        
+        },
         {
             title: "Action",
             align: "center",
@@ -277,7 +346,7 @@ const CreateUser = () => {
                             borderColor: "#4CAF50",
                             color: "white",
                         }}
-                        onClick={() => handleApprove(record.id)} // Approving an individual user
+                        onClick={() => handleApprove(record.id)}
                         icon={<CheckOutlined />}
                         type="primary"
                     />
@@ -292,15 +361,34 @@ const CreateUser = () => {
                 <div>
                     <h1 className="text-2xl font-semibold">Add User</h1>
                     <div className="flex w-full justify-between mt-6 mb-4">
-                        <Select
-                            defaultValue="10"
-                            style={{ width: 80 }}
-                            onChange={setPageSize}
-                        >
-                            <Option value="10">10</Option>
-                            <Option value="25">25</Option>
-                            <Option value="50">50</Option>
-                        </Select>
+                        <div className="space-x-2">
+                            <Select
+                                defaultValue="10"
+                                style={{ width: 80 }}
+                                onChange={setPageSize}
+                            >
+                                <Option value="10">10</Option>
+                                <Option value="25">25</Option>
+                                <Option value="50">50</Option>
+                            </Select>
+                            <Button
+                                icon={<DownloadOutlined />}
+                                onClick={handleDownloadTemplate}
+                            >
+                                Download
+                            </Button>
+                            <Upload
+                                name="file"
+                                accept=".xlsx"
+                                showUploadList={false}
+                                customRequest={handleUploadTemplate}
+                            >
+                                <Button icon={<UploadOutlined />}>
+                                    Upload
+                                </Button>
+                            </Upload>
+                        </div>
+
                         <div className="space-x-2">
                             <Button
                                 style={{
@@ -308,7 +396,7 @@ const CreateUser = () => {
                                     borderColor: "#4CAF50",
                                     color: "white",
                                 }}
-                                onClick={() => handleApprove()} // Bulk approval
+                                onClick={() => handleApprove()}
                                 disabled={selectedRowKeys.length === 0}
                             >
                                 Approve
@@ -316,8 +404,8 @@ const CreateUser = () => {
                             <Button
                                 type="primary"
                                 onClick={() => {
-                                    form.resetFields(); // Reset form fields when the modal is opened
-                                    setIsModalVisible(true); // Show modal on click
+                                    form.resetFields();
+                                    setIsModalVisible(true);
                                 }}
                             >
                                 Add
@@ -325,10 +413,10 @@ const CreateUser = () => {
                             <Search
                                 placeholder="Search User"
                                 allowClear
-                                onSearch={(value) => fetchData(value)} // Search when user presses Enter or clicks search button
+                                onSearch={(value) => fetchData(value)}
                                 onChange={(e) => {
                                     if (e.target.value === "") {
-                                        fetchData(); // Fetch all data when input is cleared
+                                        fetchData();
                                     }
                                 }}
                                 style={{ width: 200 }}
@@ -356,8 +444,8 @@ const CreateUser = () => {
                     <Modal
                         title="Add New User"
                         visible={isModalVisible}
-                        onCancel={() => setIsModalVisible(false)} // Close modal on cancel
-                        onOk={handleSave} // Show confirmation modal before saving
+                        onCancel={() => setIsModalVisible(false)}
+                        onOk={handleSave}
                         okText="Save"
                         cancelText="Cancel"
                     >
