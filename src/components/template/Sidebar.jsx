@@ -54,17 +54,23 @@ const Sidebar = () => {
       icon: <MailOutlined />,
       label: 'Kelola Siswa',
     },
-    {
-      key: '/cms/mata-pelajaran',
-      icon: <MailOutlined />,
-      label: <Link to="/cms/mata-pelajaran">Mata Pelajaran</Link>,
-    },
-    {
-      key: '/cms/kelas',
-      icon: <MailOutlined />,
-      label: <Link to="/cms/kelas">Kelas</Link>,
-    },
   ];
+
+  // Conditionally add "Mata Pelajaran" and "Kelas" for SUPER_ADMIN
+  if (hasRole(Roles.SUPER_ADMIN)) {
+    baseItems.push(
+      {
+        key: '/cms/mata-pelajaran',
+        icon: <MailOutlined />,
+        label: <Link to="/cms/mata-pelajaran">Mata Pelajaran</Link>,
+      },
+      {
+        key: '/cms/kelas',
+        icon: <MailOutlined />,
+        label: <Link to="/cms/kelas">Kelas</Link>,
+      }
+    );
+  }
 
   // Conditionally add Management Role items based on roles
   if (hasAnyRole([Roles.ADMIN, Roles.SUPER_ADMIN])) {

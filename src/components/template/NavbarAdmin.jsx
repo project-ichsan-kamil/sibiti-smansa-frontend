@@ -11,12 +11,12 @@ const NavbarAdmin = () => {
   const [userData, setUserData] = useState({ fullname: '', role: '' });
   const navigate = useNavigate();
 
-  // Fetch user data (fullname and role)
   useEffect(() => {
     api.get('/auth/me')
       .then((response) => {
         const { fullName, roles } = response.data;
-        setUserData({ fullname: fullName, role: roles[0] }); // Assuming roles[0] is the primary role
+        const primaryRole = roles.includes('ADMIN') ? 'ADMIN' : roles[0];
+        setUserData({ fullname: fullName, role: primaryRole });
       })
       .catch((err) => {
         console.error("Error fetching user data:", err);
