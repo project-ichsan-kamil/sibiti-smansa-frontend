@@ -150,7 +150,7 @@ const ManagementGuru = () => {
                         key={`delete-${record.id}`}
                         onClick={() =>
                             ModalPopup({
-                                title: "Apakah anda ingin hapus pengguna ini?",
+                                title: "Apakah anda ingin hapus data ini?",
                                 onOk: () => handleDelete(record.id),
                                 content: "Klik Ok untuk hapus data",
                             }).showConfirm()

@@ -27,7 +27,7 @@ const routes = [
   {
     path: "/cms/dashboard",
     element: (
-      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN]}>
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
         <Dashboard />
       </PrivateRoute>
     ),

@@ -7,16 +7,14 @@ import {
     Space,
     Modal,
     Form,
-    notification,
 } from "antd";
-import {
-    DeleteOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined } from "@ant-design/icons";
 import CmsTemplate from "../../components/template/CmsTemplate";
 import Loading from "../../components/template/Loading";
 import ModalPopup from "../../components/ConfirmModal";
-import axios from "axios";
 import Utils from "../../utils/Utils";
+import api from "../../config/axios";
+import { showSuccessNotification, showErrorNotification } from "../../components/template/Notification";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -24,7 +22,7 @@ const { Search } = Input;
 const ManagementAdmin = () => {
     const [form] = Form.useForm();
     const [userData, setUserData] = useState([]);
-    const { showLoading, hideLoading, loading, localUrl, getHeaders } = Utils();
+    const { showLoading, hideLoading, loading, localUrl } = Utils();
 
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -32,66 +30,52 @@ const ManagementAdmin = () => {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        fetchData();
+        fetchAdminData();
         fetchUsers();
     }, []);
 
-    const fetchData = (role = "admin", name = "") => {
+    const fetchAdminData = async (name = "") => {
         showLoading();
-        axios
-            .get(`${localUrl}/api/user-role/search?role=${role}&name=${name}`, getHeaders())
-            .then((response) => {
-                const data = response.data.data;
-                console.log(data);
-                setUserData(data);
-            })
-            .catch((e) => {
-                console.log(e);
-                const error = e.response.data;
-                notification.error({ message: error.message });
-            })
-            .finally(() => {
-                hideLoading();
-            });
+        try {
+            const response = await api.get(`/user-roles/list-admins?name=${name}`);
+            const data = response.data.data;
+            setUserData(data);
+        } catch (e) {
+            showErrorNotification(e, "Gagal mengambil data admin");
+        } finally {
+            hideLoading();
+        }
     };
 
-    const fetchUsers = () => {
-        axios
-            .get(`${localUrl}/api/users/user-verified`, getHeaders())
-            .then((response) => {
-                setUsers(response.data.data);
-            })
-            .catch((e) => {
-                console.log(e);
-                const error = e.response.data;
-                notification.error({ message: error.message });
-            });
+    const fetchUsers = async () => {
+        try {
+            const response = await api.get(`/user-roles/list-guru`);
+            setUsers(response.data.data);
+        } catch (e) {
+            showErrorNotification(e, "Gagal mengambil data guru");
+        }
     };
 
-    const deleteData = (id) => {
-        console.log(id);
+    const deleteData = async (id) => {
         showLoading();
-        axios
-            .delete(`${localUrl}/api/user-role/${id}`, getHeaders())
-            .then((response) => {
-                fetchData();
-                const res = response.data;
-                notification.success({ message: res.message });
-            })
-            .catch((e) => {
-                console.log(e);
-                const error = e.response.data;
-                notification.error({ message: error.message });
-            })
-            .finally(() => {
-                hideLoading();
+        try {
+            const response = await api.delete(`/user-roles/admin`, {
+                params: {
+                    roleId : id
+                }
             });
+            fetchAdminData();
+            showSuccessNotification("Success", response.data.message || "Admin berhasil dihapus" );
+        } catch (e) {
+            showErrorNotification(e, "Gagal menghapus user");
+        } finally {
+            hideLoading();
+        }
     };
 
     const showModal = () => {
-        form.setFieldsValue({ role: 'admin' }); // Set default role to admin
+        form.setFieldsValue({ role: "ADMIN" }); // Set default role to admin
         setIsModalVisible(true);
-        setEditMode(false);
     };
 
     const closeModal = () => {
@@ -100,34 +84,28 @@ const ManagementAdmin = () => {
     };
 
     const handleSubmit = async () => {
-        try {
-            const values = await form.validateFields();
-            console.log(values);
-            showLoading();
-                axios
-                    .post(`${localUrl}/api/user-role`, values, getHeaders())
-                    .then((response) => {
-                        fetchData();
-                        const res = response.data;
-                        notification.success({ message: res.message });
-                    })
-                    .catch((e) => {
-                        console.log(e);
-                        const error = e.response.data;
-                        notification.error({ message: error.message });
-                    })
-                    .finally(() => {
-                        hideLoading();
-                        closeModal();
-                    });
-            
-        } catch (error) {
-            console.error("Validation failed:", error);
-        }
-    };
+        const values = await form.validateFields();
 
+        if (values.userId && values.role) {
+            try {
+                showLoading();
+                const response = await api.post(`/user-roles/create`, {
+                    userId: Number(values.userId),
+                    role: values.role
+                });
+                fetchAdminData();
+                showSuccessNotification("Success", response.data.message || "User role assigned successfully.");
+                closeModal();
+            } catch (e) {
+                showErrorNotification(e, "Gagal menambahkan role user");
+            } finally {
+                hideLoading();
+            }
+        } 
+    };
+    
     const searchUser = (value) => {
-        fetchData("admin", value);
+        fetchAdminData(value);
     };
 
     const columns = [
@@ -140,8 +118,8 @@ const ManagementAdmin = () => {
                 index + 1 + (currentPage - 1) * pageSize,
         },
         {
-            title: "Nama",
-            dataIndex: "fullname",
+            title: "Name",
+            dataIndex: "fullName",
             width: "20%",
         },
         {
@@ -153,16 +131,14 @@ const ManagementAdmin = () => {
                         key={`delete-${record.id}`}
                         onClick={() =>
                             ModalPopup({
-                                title: "Apakah anda ingin hapus pengguna ini?",
-                                onOk: () => {
-                                    deleteData(record.id);
-                                },
-                                content: "Klik Ok untuk hapus data",
+                                title: "Apakah anda ingin hapus data ini?",
+                                onOk: () => deleteData(record.id),
+                                content: "Klik Ok untuk hapus data.",
                             }).showConfirm()
                         }
                         icon={<DeleteOutlined />}
                         danger
-                    ></Button>
+                    />
                 </Space>
             ),
             width: "20%",
@@ -190,14 +166,14 @@ const ManagementAdmin = () => {
                                 Tambah Admin
                             </Button>
                             <Search
-                                placeholder="Cari user"
+                                placeholder="Search Admin"
                                 allowClear
                                 onChange={(e) => {
                                     if (e.target.value === "") {
-                                        fetchData();
+                                        fetchAdminData();
                                     }
                                 }}
-                                onSearch={(value) => searchUser(value)}
+                                onSearch={searchUser}
                                 style={{ width: 200 }}
                             />
                         </div>
@@ -224,8 +200,8 @@ const ManagementAdmin = () => {
                         visible={isModalVisible}
                         onOk={handleSubmit}
                         onCancel={closeModal}
-                        okText="Simpan"
-                        cancelText="Batal"
+                        okText="Save"
+                        cancelText="Cancel"
                     >
                         <Form form={form} layout="vertical">
                             <Form.Item
@@ -234,14 +210,14 @@ const ManagementAdmin = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Pilih user",
+                                        message: "Please select a user",
                                     },
                                 ]}
                             >
-                                <Select placeholder="Pilih user">
+                                <Select placeholder="Select user">
                                     {users.map((user) => (
-                                        <Option key={user.id} value={user.id}>
-                                            {user.profile.fullName}
+                                        <Option key={user.userId} value={user.userId}>
+                                            {user.fullName}
                                         </Option>
                                     ))}
                                 </Select>
@@ -253,7 +229,7 @@ const ManagementAdmin = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Pilih role",
+                                        message: "Please select a role",
                                     },
                                 ]}
                             >
@@ -272,4 +248,3 @@ const ManagementAdmin = () => {
 };
 
 export default ManagementAdmin;
-
