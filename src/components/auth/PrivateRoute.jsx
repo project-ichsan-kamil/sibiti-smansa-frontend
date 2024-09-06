@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import api from "../../config/axios";
+import { AUTH_API } from "../../config/ApiConstants";
 
 const PrivateRoute = ({ children, allowedRoles }) => {                  //TODO handle expired token
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -8,7 +9,7 @@ const PrivateRoute = ({ children, allowedRoles }) => {                  //TODO h
   const [userRoles, setUserRoles] = useState([]);
 
   useEffect(() => {
-    api.get("/auth/me")
+    api.get(AUTH_API.authMe)
       .then((response) => {
         setIsAuthenticated(true);
         setUserRoles(response.data.roles || []);

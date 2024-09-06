@@ -3,6 +3,7 @@ import api from "../../config/axios";
 import { useNavigate } from "react-router-dom";
 import { message } from "antd";
 import { Roles } from "../../config/enum";
+import { AUTH_API } from "../../config/ApiConstants";
 
 const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -10,7 +11,7 @@ const useAuth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get("/auth/me")
+    api.get(AUTH_API.authMe)
       .then((userRes) => {
         setIsAuthenticated(true);
         const roles = userRes.data.roles;
@@ -26,7 +27,7 @@ const useAuth = () => {
   }, [navigate]);
 
   const checkAuthRole = () => {
-    api.get("/auth/me")
+    api.get(AUTH_API.authMe)
       .then((userRes) => {
         const roles = userRes.data.roles;
         if (roles.includes(Roles.SISWA)) {

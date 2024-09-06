@@ -4,6 +4,7 @@ import { Menu } from 'antd';
 import { useLocation, Link } from 'react-router-dom';
 import api from '../../config/axios';
 import { Roles } from '../../config/enum';
+import { AUTH_API } from '../../config/ApiConstants';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -18,7 +19,7 @@ const Sidebar = () => {
 
   useEffect(() => {
     // Fetch roles from the backend
-    api.get('/auth/me')
+    api.get(AUTH_API.authMe)
       .then((response) => {
         const { roles } = response.data;
         setUserRoles(roles);
@@ -40,14 +41,24 @@ const Sidebar = () => {
       label: <Link to="/cms/dashboard">Dashboard</Link>,
     },
     {
-      key: 'ujian',
-      label: 'Ujian',
+      key: '/cms/kuis',
       icon: <AppstoreOutlined />,
-      children: [
-        { key: '/cms/kuis', label: <Link to="/cms/kuis">Kuis</Link> },
-        { key: '/cms/ulangan-harian', label: <Link to="/cms/ulangan-harian">Ulangan Harian</Link> },
-        { key: '/cms/uts-uas', label: <Link to="/cms/uts-uas">UTS & UAS</Link> },
-      ],
+      label: <Link to="/cms/kuis">Kuis</Link>,
+    },
+    {
+      key: '/cms/ulangan-harian',
+      icon: <AppstoreOutlined />,
+      label: <Link to="/cms/ulangan-harian">Ulangan Harian</Link>,
+    },
+    {
+      key: '/cms/uts',
+      icon: <AppstoreOutlined />,
+      label: <Link to="/cms/uts">UTS</Link>,
+    },
+    {
+      key: '/cms/uas',
+      icon: <AppstoreOutlined />,
+      label: <Link to="/cms/uas">UAS</Link>,
     },
     {
       key: '/cms/kelola-siswa',

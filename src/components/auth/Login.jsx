@@ -1,9 +1,10 @@
 import React, { Fragment, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { message, notification } from "antd";
+import { notification } from "antd";
 import Loading from "../template/Loading";
 import api from "../../config/axios";
 import useAuth from "./userAuth";
+import { AUTH_API } from "../../config/ApiConstants";
 
 const Login = () => {
   const { isAuthenticated, checkAuthRole } = useAuth(); // Gunakan custom hook
@@ -27,7 +28,7 @@ const Login = () => {
     if (!validateInput()) return;
 
     setIsLoading(true);
-    api.post("/auth/login", data)
+    api.post(AUTH_API.login, data)
       .then(() => checkAuthRole()) // Cek role pengguna dan arahkan
       .catch((err) => {
         console.error("Error details:", err); 

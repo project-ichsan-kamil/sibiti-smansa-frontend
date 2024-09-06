@@ -4,6 +4,7 @@ import { UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import api from '../../config/axios'; // Pastikan path ini benar
 import { Roles } from '../../config/enum';
+import { AUTH_API } from '../../config/ApiConstants';
 
 const { Header } = Layout;
 
@@ -12,7 +13,7 @@ const NavbarAdmin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get('/auth/me')
+    api.get(AUTH_API.authMe)
       .then((response) => {
         const { fullName, roles } = response.data;
         const primaryRole = roles.includes('ADMIN') ? 'ADMIN' : roles[0];
@@ -25,7 +26,7 @@ const NavbarAdmin = () => {
   }, []);
 
   const handleLogout = () => {
-    api.post("/auth/logout")
+    api.post(AUTH_API.logout)
       .then(() => {
         notification.success({
           message: "Logout Successful",
