@@ -15,6 +15,7 @@ import ConfirmModal from "../../components/template/ConfirmModal";
 import Utils from "../../utils/Utils";
 import api from "../../config/axios";
 import { showErrorNotification, showSuccessNotification } from "../../components/template/Notification";
+import { ADMIN_API, GURU_API } from "../../config/ApiConstants";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -23,14 +24,17 @@ const useFetchData = (setUserData, showLoading, hideLoading) => {
     const fetchData = async (name = "") => {
         showLoading();
         try {
-            const response = await api.get(`/user-roles/list-guru?name=${name}`);
+            const response = await api.get(GURU_API.getListGuru, {
+                params: { name: name },
+            });
             setUserData(response.data.data);
         } catch (e) {
-            showErrorNotification(e, "Failed to fetch data.");
+            showErrorNotification(e, "Gagal mengambil data guru.");
         } finally {
             hideLoading();
         }
     };
+    
 
     return { fetchData };
 };
@@ -38,19 +42,19 @@ const useFetchData = (setUserData, showLoading, hideLoading) => {
 const useFetchOptions = (setUsers, setSubjects) => {
     const fetchUsers = async () => {
         try {
-            const response = await api.get(`/users/unassigned-verified-users`);
+            const response = await api.get(GURU_API.getListUnAssignUser);
             setUsers(response.data.data);
         } catch (e) {
-            showErrorNotification(e, "Failed to fetch users.");
+            showErrorNotification(e, "Gagal mengambil data user");
         }
     };
 
     const fetchSubjects = async () => {
         try {
-            const response = await api.get(`/subjects`);
+            const response = await api.get(GURU_API.getSubject);
             setSubjects(response.data.data);
         } catch (e) {
-            showErrorNotification(e, "Failed to fetch subjects.");
+            showErrorNotification(e, "Gagal mengambil data mata pelajaran");
         }
     };
 
@@ -79,13 +83,13 @@ const ManagementGuru = () => {
     const handleDelete = async (roleId) => {
         showLoading();
         try {
-            const response = await api.delete(`/user-roles/guru`, {
+            const response = await api.delete(GURU_API.deleteGuru, {
                 params: { roleId },
             });
-            showSuccessNotification("Success", response.data.message || "User deleted successfully.");
+            showSuccessNotification("Success", response.data.message || "Guru berhasil dihapus");
             fetchData();
         } catch (e) {
-            showErrorNotification(e, "Failed to delete user.");
+            showErrorNotification(e, "Gagal menghapus guru");
         } finally {
             hideLoading();
         }
@@ -96,16 +100,16 @@ const ManagementGuru = () => {
         if (values.userId && values.subjectId && values.role) {
             try {
                 showLoading();
-                const response = await api.post(`/user-roles/create`, {
+                const response = await api.post(GURU_API.createGuru, {
                     userId: Number(values.userId),
                     subjectId: Number(values.subjectId),
                     role: values.role,
                 });
-                showSuccessNotification("Success", response.data.message || "User role assigned successfully.");
+                showSuccessNotification("Success", response.data.message || "User role guru berhasil ditambahkan");
                 fetchData();
                 closeModal();
             } catch (e) {
-                showErrorNotification(e, "Failed to assign user role.");
+                showErrorNotification(e, "Gagal menambahkan role guru");
             } finally {
                 hideLoading();
             }

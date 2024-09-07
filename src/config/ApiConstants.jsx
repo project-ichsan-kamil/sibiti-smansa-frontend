@@ -43,5 +43,13 @@ const BASE_URL = {
     deleteAdmin: "/user-roles/admin"
   }
 
-  export { AUTH_API, CREATE_USER_API, CLASS_API, SUBJECT_API, ADMIN_API, BASE_URL };
+  const GURU_API = {
+    getListGuru: "/user-roles/list-guru",
+    getListUnAssignUser: "/users/unassigned-verified-users",    //list akun yang tidak punya kelas,
+    getSubject: "/subjects",
+    createGuru: "/user-roles/create",
+    deleteGuru: "/user-roles/guru"
+  }
+
+  export { AUTH_API, CREATE_USER_API, CLASS_API, SUBJECT_API, ADMIN_API, GURU_API, BASE_URL };
   
