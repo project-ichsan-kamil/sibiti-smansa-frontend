@@ -15,6 +15,7 @@ import ConfirmModal from "../../components/template/ConfirmModal";
 import Utils from "../../utils/Utils";
 import api from "../../config/axios";
 import { showSuccessNotification, showErrorNotification } from "../../components/template/Notification";
+import { ADMIN_API } from "../../config/ApiConstants";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -37,7 +38,9 @@ const ManagementAdmin = () => {
     const fetchAdminData = async (name = "") => {
         showLoading();
         try {
-            const response = await api.get(`/user-roles/list-admins?name=${name}`);
+            const response = await api.get(ADMIN_API.fetchAdmin, {
+                params: { name: name },
+            });
             const data = response.data.data;
             setUserData(data);
         } catch (e) {
@@ -46,10 +49,11 @@ const ManagementAdmin = () => {
             hideLoading();
         }
     };
+    
 
     const fetchUsers = async () => {
         try {
-            const response = await api.get(`/user-roles/list-guru`);
+            const response = await api.get(ADMIN_API.getListGuru);
             setUsers(response.data.data);
         } catch (e) {
             showErrorNotification(e, "Gagal mengambil data guru");
@@ -59,7 +63,7 @@ const ManagementAdmin = () => {
     const deleteData = async (id) => {
         showLoading();
         try {
-            const response = await api.delete(`/user-roles/admin`, {
+            const response = await api.delete(ADMIN_API.deleteAdmin, {
                 params: {
                     roleId : id
                 }
@@ -89,12 +93,12 @@ const ManagementAdmin = () => {
         if (values.userId && values.role) {
             try {
                 showLoading();
-                const response = await api.post(`/user-roles/create`, {
+                const response = await api.post(ADMIN_API.createAdmin, {
                     userId: Number(values.userId),
                     role: values.role
                 });
                 fetchAdminData();
-                showSuccessNotification("Success", response.data.message || "User role assigned successfully.");
+                showSuccessNotification("Success", response.data.message || "Role admin berhasil ditambahkan");
                 closeModal();
             } catch (e) {
                 showErrorNotification(e, "Gagal menambahkan role user");
@@ -166,7 +170,7 @@ const ManagementAdmin = () => {
                                 Tambah Admin
                             </Button>
                             <Search
-                                placeholder="Search Admin"
+                                placeholder="Cari Admin"
                                 allowClear
                                 onChange={(e) => {
                                     if (e.target.value === "") {

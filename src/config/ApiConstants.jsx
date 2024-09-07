@@ -36,5 +36,12 @@ const BASE_URL = {
     fetchSubject: "/subjects"
   }
 
-  export { AUTH_API, CREATE_USER_API, CLASS_API, SUBJECT_API, BASE_URL };
+  const ADMIN_API = {
+    fetchAdmin: "/user-roles/list-admins",
+    getListGuru: "/user-roles/list-guru",
+    createAdmin: "/user-roles/create",
+    deleteAdmin: "/user-roles/admin"
+  }
+
+  export { AUTH_API, CREATE_USER_API, CLASS_API, SUBJECT_API, ADMIN_API, BASE_URL };
   
