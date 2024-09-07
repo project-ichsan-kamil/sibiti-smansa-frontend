@@ -2,7 +2,7 @@ import React from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 
-const ModalPopup = ({ title, onOk, onCancel, content }) => {
+const ConfirmModal = ({ title, onOk, onCancel, content }) => {
     const showConfirm = () => {
         Modal.confirm({
             title: title || 'Do you want to delete these items?',
@@ -31,4 +31,4 @@ const ModalPopup = ({ title, onOk, onCancel, content }) => {
     return { showConfirm, success, error };
 };
 
-export default ModalPopup;
+export default ConfirmModal;

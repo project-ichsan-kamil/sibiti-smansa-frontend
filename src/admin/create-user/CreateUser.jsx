@@ -20,9 +20,10 @@ import {
 } from "@ant-design/icons";
 import CmsTemplate from "../../components/template/CmsTemplate";
 import Loading from "../../components/template/Loading";
-import ModalPopup from "../../components/ConfirmModal";
+import ConfirmModal from "../../components/template/ConfirmModal";
 import Utils from "../../utils/Utils";
 import api from "../../config/axios";
+import { CREATE_USER_API } from "../../config/ApiConstants";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -49,11 +50,11 @@ const CreateUser = () => {
         try {
             let response;
             if (searchQuery) {
-                response = await api.get(`/users/search`, {
+                response = await api.get(CREATE_USER_API.searchUser, {
                     params: { fullName: searchQuery, isVerified: true },
                 });
             } else {
-                response = await api.get(`users/user-unverified`);
+                response = await api.get(CREATE_USER_API.getUnVerifiedUser);
             }
 
             const dataWithKeys = response.data.data.map((item, index) => ({
@@ -65,7 +66,7 @@ const CreateUser = () => {
             notification.error({
                 message: "Error",
                 description:
-                    e.response?.data?.message || "Failed to fetch data",
+                    e.response?.data?.message || "Gagal mengambil data user",
             });
         } finally {
             hideLoading();
@@ -74,12 +75,12 @@ const CreateUser = () => {
 
     const fetchClassOptions = async () => {
         try {
-            const response = await api.get("/classes");
+            const response = await api.get(CREATE_USER_API.getClass);
             setClassOptions(response.data.data);
         } catch (e) {
             notification.error({
                 message: "Error",
-                description: "Failed to fetch class options.",
+                description: "Gagal mengambil data kelas.",
             });
         }
     };
@@ -87,22 +88,22 @@ const CreateUser = () => {
     const deleteData = async (id) => {
         showLoading();
         try {
-            const response = await api.delete(`/users/delete`, {
+            const response = await api.delete(CREATE_USER_API.deleteUser, {
                 params: { userId: id },
             });
             fetchData();
             notification.success({
-                message: "Deleted Successfully",
+                message: "Success",
                 description:
                     response.data.message ||
-                    "The user has been successfully deleted.",
+                    "User berhasil dihpaus",
             });
         } catch (e) {
             notification.error({
-                message: "Deletion Failed",
+                message: "Error",
                 description:
                     e.response?.data?.message ||
-                    "Failed to delete the user. Please try again or contact support.",
+                    "Gagal hapus user, Silahkan coba lagi.",
             });
         } finally {
             hideLoading();
@@ -114,17 +115,8 @@ const CreateUser = () => {
         try {
             const idsToApprove = userIds ? [userIds] : selectedRowKeys;
 
-            if (idsToApprove.length === 0) {
-                notification.warning({
-                    message: "No users selected",
-                    description: "Please select at least one user to approve.",
-                });
-                return;
-            }
-
             const userIdsString = idsToApprove.join(",");
-            const response = await api.post(
-                `/users/verify`,
+            const response = await api.post(CREATE_USER_API.approveUser,
                 {},
                 {
                     params: { userIds: userIdsString },
@@ -132,15 +124,15 @@ const CreateUser = () => {
             );
             fetchData();
             notification.success({
-                message: "Approval Successful",
+                message: "Success",
                 description: response.data.message,
             });
         } catch (e) {
             notification.error({
-                message: "Approval Failed",
+                message: "Error",
                 description:
                     e.response?.data?.message ||
-                    "An unexpected error occurred during the approval process. Please try again.",
+                    "Gagal dalam proses approve. Silahkan coba lagi.",
             });
         } finally {
             hideLoading();
@@ -150,18 +142,18 @@ const CreateUser = () => {
     const handleFormSubmit = async (values) => {
         try {
             showLoading();
-            const response = await api.post("/users/create", values);
+            const response = await api.post(CREATE_USER_API.createUser, values);
             notification.success({
-                message: "User Created Successfully",
+                message: "Success",
                 description: response.data.message,
             });
             fetchData();
         } catch (e) {
             notification.error({
-                message: "Creation Failed",
+                message: "Error",
                 description:
-                    e.response?.data?.message ||
-                    "An unexpected error occurred during user creation. Please try again.",
+                e.response?.data?.message ||
+                "Terjadi kesalahan dalam pembuatan user, Silakan coba lagi.",
             });
         } finally {
             hideLoading();
@@ -190,8 +182,7 @@ const CreateUser = () => {
     const handleDownloadTemplate = async () => {
         showLoading();
         try {
-            const response = await api.get(
-                "/excel/generate-template-create-user",
+            const response = await api.get(CREATE_USER_API.downloadTemplateExcel,
                 {
                     responseType: "blob", // Set response type to blob for file download
                 }
@@ -204,9 +195,9 @@ const CreateUser = () => {
             link.click();
         } catch (e) {
             notification.error({
-                message: "Download Failed",
+                message: "Error",
                 description:
-                    e.response?.data?.message || "Failed to download template.",
+                    e.response?.data?.message || "Gagal download template.",
             });
         } finally {
             hideLoading();
@@ -215,44 +206,43 @@ const CreateUser = () => {
 
     const handleUploadTemplate = async (options) => {
         const { file } = options;
-
+    
         if (!file) {
-            console.error("No file found in upload request");
             notification.error({
-                message: "No File Provided",
-                description: "Please select a file to upload.",
+                message: "Error",
+                description: "File Tidak Ditemukan",
             });
             return;
         }
-
+    
         const formData = new FormData();
         formData.append("file", file);
-
+    
         showLoading();
         try {
-            const response = await api.post("/users/upload-excel", formData, {
+            const response = await api.post(CREATE_USER_API.uploadTemplateExcel, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
             notification.success({
-                message: "Upload Successful",
+                message: "Success",
                 description: response.data.message,
             });
-            fetchData(); // Refresh user data after successful upload
+            fetchData(); // Refresh data user setelah unggah berhasil
         } catch (e) {
             console.error("Upload error:", e);
             notification.error({
-                message: "Upload Failed",
+                message: "Error",
                 description:
                     e.response?.data?.message ||
-                    "Failed to upload template. Please try again.",
+                    "Gagal mengunggah template. Silakan coba lagi.",
             });
         } finally {
             hideLoading();
             fetchData(); 
         }
-    };
+    }; 
 
     const rowSelection = {
         selectedRowKeys,
@@ -330,10 +320,10 @@ const CreateUser = () => {
                 <Space size="small">
                     <Button
                         onClick={() =>
-                            ModalPopup({
-                                title: "Are you sure you want to delete this user?",
+                            ConfirmModal({
+                                title: "Apakah Anda yakin menghapus data ini?",
                                 onOk: () => deleteData(record.id),
-                                content: "Click OK to confirm user deletion.",
+                                content: "Klik OK untuk menghapusan data.",
                             }).showConfirm()
                         }
                         icon={<DeleteOutlined />}

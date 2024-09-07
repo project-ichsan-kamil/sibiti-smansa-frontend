@@ -11,7 +11,7 @@ import {
 import { DeleteOutlined } from "@ant-design/icons";
 import CmsTemplate from "../../components/template/CmsTemplate";
 import Loading from "../../components/template/Loading";
-import ModalPopup from "../../components/ConfirmModal";
+import ConfirmModal from "../../components/template/ConfirmModal";
 import Utils from "../../utils/Utils";
 import api from "../../config/axios";
 import { showSuccessNotification, showErrorNotification } from "../../components/template/Notification";
@@ -130,7 +130,7 @@ const ManagementAdmin = () => {
                     <Button
                         key={`delete-${record.id}`}
                         onClick={() =>
-                            ModalPopup({
+                            ConfirmModal({
                                 title: "Apakah anda ingin hapus data ini?",
                                 onOk: () => deleteData(record.id),
                                 content: "Klik Ok untuk hapus data.",
