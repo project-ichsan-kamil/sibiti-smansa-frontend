@@ -5,6 +5,7 @@ import Loading from "../../components/template/Loading";
 import Utils from "../../utils/Utils";
 import api from "../../config/axios";
 import { showErrorNotification } from "../../components/template/Notification";
+import { CLASS_API } from "../../config/ApiConstants";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -23,7 +24,9 @@ const Kelas = () => {
     const fetchClassData = async (name = "") => {
         showLoading();
         try {
-            const response = await api.get(`/classes?name=${name}`);
+            const response = await api.get(CLASS_API.fetchClass, {
+                params: { name: name },
+            });
             const data = response.data.data;
             setClassData(data);
         } catch (e) {
@@ -32,6 +35,7 @@ const Kelas = () => {
             hideLoading();
         }
     };
+    
 
     const searchClass = (value) => {
         fetchClassData(value);

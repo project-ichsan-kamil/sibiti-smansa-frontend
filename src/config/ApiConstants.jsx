@@ -28,5 +28,8 @@ const BASE_URL = {
     getClass : "/classes"
   };
   
-  export { AUTH_API, CREATE_USER_API, BASE_URL };
+  const CLASS_API = {
+    fetchClass : "/classes"
+  }
+  export { AUTH_API, CREATE_USER_API, CLASS_API, BASE_URL };
   
