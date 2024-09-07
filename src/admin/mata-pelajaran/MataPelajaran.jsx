@@ -5,6 +5,7 @@ import Loading from "../../components/template/Loading";
 import Utils from "../../utils/Utils";
 import api from "../../config/axios";
 import { showErrorNotification } from "../../components/template/Notification";
+import { SUBJECT_API } from "../../config/ApiConstants";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -23,7 +24,9 @@ const MataPelajaran = () => {
     const fetchSubjectData = async (name = "") => {
         showLoading();
         try {
-            const response = await api.get(`/subjects?name=${name}`);
+            const response = await api.get(SUBJECT_API.fetchSubject, {
+                params: { name: name },
+            });
             const data = response.data.data;
             setSubjectData(data);
         } catch (e) {
@@ -31,7 +34,7 @@ const MataPelajaran = () => {
         } finally {
             hideLoading();
         }
-    };
+    };    
 
     const searchSubject = (value) => {
         fetchSubjectData(value);
