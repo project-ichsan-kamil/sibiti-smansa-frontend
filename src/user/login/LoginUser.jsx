@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import image from '../assets/UserImage';
+import image from '../../assets/UserImage';
 
-const LoginPage = () => {
+const LoginUser = () => {
   const [isSplashVisible, setIsSplashVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -145,6 +145,6 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default LoginUser;
 
 

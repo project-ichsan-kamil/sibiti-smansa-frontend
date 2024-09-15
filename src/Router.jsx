@@ -1,5 +1,4 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Home from "./user/Home";
 import ErrorPage from "./components/auth/ErrorPage";
 import Login from "./components/auth/Login";
 import Dashboard from "./admin/dashboard/Dashboard";
@@ -13,13 +12,34 @@ import MataPelajaran from "./admin/mata-pelajaran/MataPelajaran";
 import PrivateRoute from "./components/auth/PrivateRoute";
 import { Roles } from "./config/enum";
 import NotAuthorizedPage from "./components/auth/NotAuthorizedPage ";
+import FormExam from "./admin/ujian/FormExam";
+import ChangePassword from "./user/change-password/ChangePassword";
+import LoginUser from "./user/login/LoginUser";
+import ForgotPassword from "./user/forgot-password/ForgotPassword";
+import DashboardUser from "./user/dashboard/DashboardUser";
 
 const routes = [
   {
     path: "/",
-    element: <Home />,
+    element: <LoginUser/>,
     errorElement: <ErrorPage />,
   },
+  {
+    path: "/change-password",
+    element: <ChangePassword />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/dashboard",
+    element: <DashboardUser />,
+  },
+
+
+
+  //cms
   {
     path: "/login",
     element: <Login />,
@@ -52,7 +72,7 @@ const routes = [
     path: "/cms/kuis/add",
     element: (
       <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
-        <FormKuis />
+        <FormExam />
       </PrivateRoute>
     ),
   },
@@ -61,6 +81,30 @@ const routes = [
     element: (
       <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
         <FormKuis />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/cms/uh/add",
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
+        <FormExam />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/cms/uts/add",
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN]}>
+        <FormExam />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/cms/uas/add",
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN]}>
+        <FormExam />
       </PrivateRoute>
     ),
   },
