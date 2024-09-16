@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Warna background track scrollbar */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #2881CF; /* Warna scrollbar (blue-500 Tailwind) */
+  border-radius: 10px;
+  border: 10px solid transparent;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #2881CF; /* Warna saat di-hover */
+}
+
+
