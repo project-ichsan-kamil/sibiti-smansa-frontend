@@ -206,7 +206,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
     >
       <div className="relative flex flex-col h-full p-4">
         
-        {/* Tombol Close (hanya di mobile view, posisi absolute) */}
         <button 
           onClick={toggleSidebar} 
           className="absolute top-2 right-2 lg:hidden text-2xl p-2 focus:outline-none"
@@ -220,7 +219,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             src={image.smansa} 
             alt="Logo" 
             className="h-16 lg:h-24 mb-4" 
-          /> {/* Ukuran logo dikurangi di mobile view */}
+          />
         </div>
 
         {/* Sidebar Menu */}
