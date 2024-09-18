@@ -51,5 +51,10 @@ const BASE_URL = {
     deleteGuru: "/user-roles/guru"
   }
 
-  export { AUTH_API, CREATE_USER_API, CLASS_API, SUBJECT_API, ADMIN_API, GURU_API, BASE_URL };
+  const KUIS_API = {
+    getSubjectBaseOnGuru: "/user-roles/guru-subjects",
+    getListKuis: "/exam"
+  }
+
+  export { AUTH_API, CREATE_USER_API, CLASS_API, SUBJECT_API, ADMIN_API, GURU_API, KUIS_API, BASE_URL };
   
