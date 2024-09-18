@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import UserTemplate from '../../components/template/user/UserTemplate';
-import 'leaflet/dist/leaflet.css';
 
 const Absensi = () => {
-  const [position, setPosition] = useState([51.505, -0.09]); // Default position (London)
+  const [position, setPosition] = useState([51.505, -0.09]); //TODO Change default
   const [accuracy, setAccuracy] = useState(null);
   const [locationStatus, setLocationStatus] = useState('Mengambil lokasi...');
   const [statusBgColor, setStatusBgColor] = useState('bg-gray-500'); // Default background color (gray)
   const [isAccurateEnough, setIsAccurateEnough] = useState(false);
-  const [loading, setLoading] = useState(false); // State untuk loading
 
   // Fungsi untuk mengambil posisi GPS menggunakan Geolocation API
   const getLocation = () => {
-    setLoading(true); // Set loading ke true saat refresh
     if ('geolocation' in navigator) {
       navigator.geolocation.watchPosition(
         (position) => {
@@ -42,18 +39,15 @@ const Absensi = () => {
             setLocationStatus(`Akurasi lokasi: ${Math.floor(accuracy)}m. Lokasi terlalu lemah.`);
           }
 
-          setLoading(false); // Set loading ke false setelah posisi diperbarui
         },
         (error) => {
           setLocationStatus('Gagal mendapatkan lokasi. Pastikan GPS aktif.');
           console.error('Error getting location:', error);
-          setLoading(false); // Set loading ke false jika terjadi error
         },
         { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
       );
     } else {
       setLocationStatus('Geolocation tidak didukung di browser ini.');
-      setLoading(false); // Set loading ke false jika geolocation tidak didukung
     }
   };
 

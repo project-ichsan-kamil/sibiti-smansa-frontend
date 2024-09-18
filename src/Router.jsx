@@ -17,6 +17,7 @@ import ChangePassword from "./user/change-password/ChangePassword";
 import LoginUser from "./user/login/LoginUser";
 import ForgotPassword from "./user/forgot-password/ForgotPassword";
 import DashboardUser from "./user/dashboard/DashboardUser";
+import Absensi from "./user/absensi/Absensi";
 
 const routes = [
   {
@@ -35,6 +36,10 @@ const routes = [
   {
     path: "/dashboard",
     element: <DashboardUser />,
+  },
+  {
+    path: "/absensi",
+    element: <Absensi/>,
   },
 
 
