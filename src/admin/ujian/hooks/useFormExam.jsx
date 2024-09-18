@@ -83,11 +83,23 @@ export const useFormExam = () => {
                 await api.patch(`/kuis/${id}`, {
                     ...values,
                     subjectId: Number(values.subjectId),
-                    sameAsOtherExam: values.sameAsOtherExam || false
+                    otherExamId: Number(values.otherExamId),
+                    sameAsOtherExam: values.sameAsOtherExam || false,
+                    ...(values.participantType == "CLASS" 
+                        ? { classIds: values.peserta.join(",") } 
+                        : { userIds: values.peserta.join(",") }),
                 });
                 showSuccessNotification("Kuis berhasil diperbarui");
             } else {
-                await api.post("/exam/create-quiz-daily-exam", values);
+                await api.post("/exam/create-quiz-daily-exam", {
+                    ...values,
+                    subjectId: Number(values.subjectId),
+                    otherExamId: Number(values.otherExamId),
+                    sameAsOtherExam: values.sameAsOtherExam || false,
+                    ...(values.participantType == "CLASS" 
+                        ? { classIds: values.peserta.join(",") } 
+                        : { userIds: values.peserta.join(",") }),
+                });
                 showSuccessNotification("Kuis berhasil dibuat");
             }
             window.location.href = "/cms/kuis";
@@ -159,7 +171,7 @@ export const useFormExam = () => {
 
         setDuplicateEnabled(checked);
         if (!checked) {
-            form.resetFields(["duplicateKuisId"]);
+            form.resetFields(["otherExamId"]);
         }
     };
 

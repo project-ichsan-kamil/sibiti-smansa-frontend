@@ -274,7 +274,7 @@ const FormExam = () => {
                                 </Form.Item>
 
                                 <Form.Item
-                                    name="duplicateKuisId"
+                                    name="otherExamId"
                                     label="Pilih Ujian yang akan diduplikat"
                                     className="w-4/12"
                                 >
