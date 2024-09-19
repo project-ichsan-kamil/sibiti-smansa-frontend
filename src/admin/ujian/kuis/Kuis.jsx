@@ -1,38 +1,374 @@
+// import React, { useState, useEffect, Fragment } from "react";
+// import { Table, Select, Input, Button, Space, Tabs, Tag } from "antd";
+// import { DeleteOutlined, EditOutlined, CheckCircleTwoTone, RocketOutlined, InfoCircleOutlined } from '@ant-design/icons';
+// import Loading from "../../../components/template/Loading";
+// import CmsTemplate from '../../../components/template/CmsTemplate';
+// import ModalPopup from "../../../components/template/ConfirmModal";
+// import api from '../../../config/axios';
+// import { showErrorNotification, showSuccessNotification } from '../../../components/template/Notification';
+// import KuisDetailModal from "./KuisDetailModal"; // Import the modal component
+
+// const { Option } = Select;
+// const { Search } = Input;
+// const { TabPane } = Tabs;
+
+// const Kuis = () => {
+//     const [upcomingKuisData, setUpcomingKuisData] = useState([]);
+//     const [completeKuisData, setCompleteKuisData] = useState([]);
+//     const [loading, setLoading] = useState(false);
+//     const [isModalVisible, setIsModalVisible] = useState(false); 
+//     const [selectedKuis, setSelectedKuis] = useState(null); 
+
+//     const [upcomingCurrentPage, setUpcomingCurrentPage] = useState(1);
+//     const [upcomingPageSize, setUpcomingPageSize] = useState(10);
+//     const [completeCurrentPage, setCompleteCurrentPage] = useState(1);
+//     const [completePageSize, setCompletePageSize] = useState(10);
+
+//     useEffect(() => {
+//         getAllKuis();
+//     }, []);
+
+//     const getAllKuis = async () => {
+//         setLoading(true);
+//         try {
+//             const upcomingResponse = await api.get('/exam', {
+//                 params: { statusExam: ['PUBLISH', 'DRAFT', 'WAITING_SUBMITTER', 'SHOW'], examType: "KUIS" }
+//             });
+
+//             const completeResponse = await api.get('/exam', {
+//                 params: { statusExam: ['CLOSE'], examType: "KUIS" }
+//             });
+
+//             const upcomingKuis = upcomingResponse.data.data;
+//             const completeKuis = completeResponse.data.data;
+
+//             setUpcomingKuisData(upcomingKuis);
+//             setCompleteKuisData(completeKuis);
+//         } catch (error) {
+//             showErrorNotification(error, "Gagal mengambil data kuis");
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     const deleteKuis = async (id) => {
+//         try {
+//             await api.delete(`/kuis/${id}`);
+//             showSuccessNotification("Kuis berhasil dihapus");
+//             getAllKuis(); 
+//         } catch (error) {
+//             showErrorNotification(error, "Gagal menghapus kuis");
+//         }
+//     };
+
+//     const showModal = (record) => {
+//         setSelectedKuis(record);
+//         setIsModalVisible(true);
+//     };
+
+//     const handleOk = () => {
+//         setIsModalVisible(false);
+//         setSelectedKuis(null);
+//     };
+
+//     const handleCancel = () => {
+//         setIsModalVisible(false);
+//         setSelectedKuis(null);
+//     };
+
+//     const convertToIndonesiaTime = (dateString) => {
+//         return new Date(dateString).toLocaleString('id-ID', {
+//             timeZone: 'Asia/Jakarta',
+//         });
+//     };
+
+//     const searchKuis = (e) => {
+//         const searchText = e.target.value;
+//     };
+
+//     const renderTable = (data, currentPage, pageSize, setCurrentPage, setPageSize) => {
+//         const columns = [
+//             {
+//                 title: "No",
+//                 align: 'center',
+//                 dataIndex: "id",
+//                 key: "id",
+//                 width: "3%",
+//                 render: (text, record, index) => index + 1 + (currentPage - 1) * pageSize,
+//             },
+//             {
+//                 title: "Nama",
+//                 dataIndex: "name",
+//                 key: "name",
+//             },
+//             {
+//                 title: "Mulai",
+//                 dataIndex: "startDate",
+//                 key: "startDate",
+//                 render: (text) => new Date(text).toLocaleString('id-ID', {
+//                     timeZone: 'Asia/Jakarta',
+//                 }),
+//             },
+//             {
+//                 title: "Durasi",
+//                 dataIndex: "duration",
+//                 key: "duration",
+//                 render: (text) => `${text} Menit`,
+//             },
+//             {
+//                 title: "KKM",
+//                 dataIndex: "passingGrade",
+//                 key: "passingGrade",
+//             },
+            
+//             {
+//                 title: "Soal",
+//                 dataIndex: "sumQuestion",
+//                 key: "sumQuestion",
+//                 render: (text) => `${text} Soal`,
+//             },
+           
+//             {
+//                 title: "Acak Soal",
+//                 dataIndex: "randomize",
+//                 key: "randomize",
+//                 render: (randomize) => (
+//                     randomize ? <Tag color="blue">Acak</Tag> : null
+//                 ),
+//             },
+//             {
+//                 title: "Status",
+//                 dataIndex: "statusExam",
+//                 key: "statusExam",
+//                 render: (status) => (
+//                     <Tag color={status === "WAITING_SUBMITTER" ? "orange" : "green"}>
+//                         {status}
+//                     </Tag>
+//                 ),
+//             },
+//             {
+//                 title: "Action",
+//                 key: "action",
+//                 align: 'center',
+//                 render: (text, record) => (
+//                     <Space size="small">
+//                         <Button
+//                             key={`info-${record.id}`}
+//                             onClick={() => showModal(record)}
+//                             icon={<InfoCircleOutlined />}
+//                         />
+//                         <Button
+//                             key={`edit-${record.id}`}
+//                             onClick={() => window.location.href = "/cms/kuis/edit/" + record.id}
+//                             icon={<EditOutlined />}
+//                         />
+//                         <Button
+//                             key={`delete-${record.id}`}
+//                             onClick={() => ModalPopup({
+//                                 title: "Apakah anda ingin hapus kuis ini?",
+//                                 onOk: () => deleteKuis(record.id),
+//                                 content: "Klik Ok untuk hapus data",
+//                             }).showConfirm()}
+//                             danger
+//                             icon={<DeleteOutlined />}
+//                         />
+//                     </Space>
+//                 ),
+//                 width: "10%",
+//             },
+//         ];
+
+//         return (
+//             <Table
+//                 columns={columns}
+//                 dataSource={data}
+//                 pagination={{
+//                     current: currentPage,
+//                     pageSize: pageSize,
+//                     onChange: (page, pageSize) => {
+//                         setCurrentPage(page);
+//                         setPageSize(pageSize);
+//                     },
+//                     showSizeChanger: false,
+//                     position: ["bottomCenter"]
+//                 }}
+//                 size="small"
+//             />
+//         );
+//     };
+
+//     return (
+//         <Fragment>
+//             <CmsTemplate>
+//                 <div>
+//                     <h1 className="text-2xl font-semibold">Kuis</h1>
+//                     <div className="flex w-full justify-between mt-6 mb-4">
+//                         <Select
+//                             defaultValue="10"
+//                             style={{ width: 80 }}
+//                             onChange={(value) => setUpcomingPageSize(value)}
+//                         >
+//                             <Option value="10">10</Option>
+//                             <Option value="25">25</Option>
+//                             <Option value="50">50</Option>
+//                         </Select>
+
+//                         <div className="space-x-2">
+//                             <Button type="primary" onClick={() => { window.location.href = "/cms/kuis/add" }}>Tambah</Button>
+//                             <Search
+//                                 placeholder="Cari kuis"
+//                                 allowClear
+//                                 onChange={searchKuis}
+//                                 style={{ width: 200 }}
+//                             />
+//                         </div>
+//                     </div>
+
+//                     <Tabs defaultActiveKey="1">
+//                         <TabPane tab={
+//                             <span>
+//                                 <RocketOutlined className="mr-2" />
+//                                 Upcoming
+//                             </span>
+//                         } key="1">
+//                             {renderTable(upcomingKuisData, upcomingCurrentPage, upcomingPageSize, setUpcomingCurrentPage, setUpcomingPageSize)}
+//                         </TabPane>
+//                         <TabPane
+//                             tab={
+//                                 <span>
+//                                     <CheckCircleTwoTone className="mr-2" twoToneColor="#52c41a" />
+//                                     Complete
+//                                 </span>
+//                             } key="2">
+//                             {renderTable(completeKuisData, completeCurrentPage, completePageSize, setCompleteCurrentPage, setCompletePageSize)}
+//                         </TabPane>
+//                     </Tabs>
+//                 </div>
+//             </CmsTemplate>
+
+//             {loading && <Loading />}
+
+//             {/* Modal for detailed view */}
+//             <KuisDetailModal
+//                 visible={isModalVisible}
+//                 onClose={handleOk}
+//                 kuis={selectedKuis}
+//             />
+//         </Fragment>
+//     );
+// };
+
+// export default Kuis;
+
+
 import React, { useState, useEffect, Fragment } from "react";
-import { Table, Select, Input, Button, Space, Form, Tabs, Tag } from "antd";
-import { DeleteOutlined, EditOutlined, CheckCircleTwoTone, RocketOutlined } from '@ant-design/icons';
-import Loading from "../../../components/template/Loading"
+import { Table, Select, Input, Button, Space, Tabs, Tag } from "antd";
+import { DeleteOutlined, EditOutlined, CheckCircleTwoTone, RocketOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import Loading from "../../../components/template/Loading";
 import CmsTemplate from '../../../components/template/CmsTemplate';
-import ModalPopup from "../../../components/ConfirmModal";
-import KuisHooks from "./hooks/KuisHooks";
+import ModalPopup from "../../../components/template/ConfirmModal";
+import api from '../../../config/axios';
+import { showErrorNotification, showSuccessNotification } from '../../../components/template/Notification';
+import KuisDetailModal from "./KuisDetailModal"; // Import the modal component
 
 const { Option } = Select;
 const { Search } = Input;
 const { TabPane } = Tabs;
 
 const Kuis = () => {
-    // form data
-    const [form] = Form.useForm();
-    
-    const {getAllKuis,convertToIndonesiaTime, deleteKuis, upcomingKuisData, loading} = KuisHooks()
+    const [upcomingKuisData, setUpcomingKuisData] = useState([]);
     const [completeKuisData, setCompleteKuisData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState(false); 
+    const [selectedKuis, setSelectedKuis] = useState(null); 
 
-    // pagination
     const [upcomingCurrentPage, setUpcomingCurrentPage] = useState(1);
     const [upcomingPageSize, setUpcomingPageSize] = useState(10);
     const [completeCurrentPage, setCompleteCurrentPage] = useState(1);
     const [completePageSize, setCompletePageSize] = useState(10);
 
     useEffect(() => {
-        getAllKuis()
+        getAllKuis();
     }, []);
 
-    const handleEdit = (id) => {
-        // logic to handle edit
+    const getAllKuis = async () => {
+        setLoading(true);
+        try {
+            const upcomingResponse = await api.get('/exam', {
+                params: { statusExam: ['PUBLISH', 'DRAFT', 'WAITING_SUBMITTER', 'SHOW'], examType: "KUIS" }
+            });
+
+            const completeResponse = await api.get('/exam', {
+                params: { statusExam: ['CLOSE'], examType: "KUIS" }
+            });
+
+            const upcomingKuis = upcomingResponse.data.data;
+            const completeKuis = completeResponse.data.data;
+
+            setUpcomingKuisData(upcomingKuis);
+            setCompleteKuisData(completeKuis);
+        } catch (error) {
+            showErrorNotification(error, "Gagal mengambil data kuis");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const deleteKuis = async (id) => {
+        try {
+            await api.delete(`/kuis/${id}`);
+            showSuccessNotification("Kuis berhasil dihapus");
+            getAllKuis(); 
+        } catch (error) {
+            showErrorNotification(error, "Gagal menghapus kuis");
+        }
+    };
+
+    const showModal = (record) => {
+        setSelectedKuis(record);
+        setIsModalVisible(true);
+    };
+
+    const handleOk = () => {
+        setIsModalVisible(false);
+        setSelectedKuis(null);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+        setSelectedKuis(null);
+    };
+
+    const convertToIndonesiaTime = (dateString) => {
+        return new Date(dateString).toLocaleString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Asia/Jakarta',
+        });
+    };
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case "WAITING_SUBMITTER":
+                return "gold";
+            case "PUBLISH":
+                return "green";
+            case "DRAFT":
+                return "default";
+            case "CLOSE":
+                return "red";
+            case "SHOW":
+                return "blue";
+            default:
+                return "default";
+        }
     };
 
     const searchKuis = (e) => {
-        // logic to search kuis
+        const searchText = e.target.value;
     };
 
     const renderTable = (data, currentPage, pageSize, setCurrentPage, setPageSize) => {
@@ -46,63 +382,52 @@ const Kuis = () => {
                 render: (text, record, index) => index + 1 + (currentPage - 1) * pageSize,
             },
             {
-                title: "Judul",
-                align: 'center',
-                dataIndex: "nama",
-                key: "nama",
-                width: "17%",
+                title: "Nama",
+                dataIndex: "name",
+                key: "name",
             },
             {
                 title: "Mulai",
-                align: 'center',
-                dataIndex: "mulai",
-                key: "mulai",
-                width: "10%",
-                render: (text) => convertToIndonesiaTime(text), 
-            },
-            {
-                title: "Selesai",
-                align: 'center',
-                dataIndex: "selesai",
-                key: "selesai",
-                width: "10%",
-                render: (text) => convertToIndonesiaTime(text), 
+                dataIndex: "startDate",
+                key: "startDate",
+                render: (text) => convertToIndonesiaTime(text),
             },
             {
                 title: "Durasi",
-                align: 'center',
-                dataIndex: "durasi",
-                key: "durasi",
+                dataIndex: "duration",
+                key: "duration",
                 render: (text) => `${text} Menit`,
-                width: "10%",
             },
             {
-                title: "Peserta",
-                align: 'center',
-                dataIndex: "peserta",
-                key: "peserta",
-                width: "15%",
-                render: (peserta) => (
-                    <div>
-                      {peserta.map((item, index) => (
-                        <Tag color="default" key={index}>
-                          {item}
-                        </Tag>
-                      ))}
-                    </div>
-                  ),
+                title: "KKM",
+                dataIndex: "passingGrade",
+                key: "passingGrade",
+            },
+            
+            {
+                title: "Soal",
+                dataIndex: "sumQuestion",
+                key: "sumQuestion",
+                render: (text) => `${text} Soal`,
+            },
+           
+            {
+                title: "Acak Soal",
+                dataIndex: "randomize",
+                key: "randomize",
+                render: (randomize) => (
+                    randomize ? <Tag color="blue">Acak</Tag> : null
+                ),
             },
             {
-                title: "Status",        //TODO statusnya ditambah waiting soal
-                dataIndex: "statusUjian",
-                key: "status",
-                width: "8%",
-                align: 'center',
+                title: "Status",
+                dataIndex: "statusExam",
+                key: "statusExam",
                 render: (status) => (
-                    <p style={{ color: status === 1 ? 'blue' : 'red' }}>
-                        {status == 1 ? "Publish" : "Draft"}
-                    </p>
-                )
+                    <Tag color={getStatusColor(status)}>
+                        {status}
+                    </Tag>
+                ),
             },
             {
                 title: "Action",
@@ -111,21 +436,25 @@ const Kuis = () => {
                 render: (text, record) => (
                     <Space size="small">
                         <Button
-                            key={`delete-${record.id}`}
-                            onClick={() => ModalPopup({
-                                title: "Apakah anda ingin hapus kuis ini?",
-                                onOk: () => {
-                                    deleteKuis(record.id);
-                                },
-                                content: "Klik Ok untuk hapus data",
-                            }).showConfirm()}
-                            danger
-                            icon={<DeleteOutlined />}
+                            key={`info-${record.id}`}
+                            onClick={() => showModal(record)}
+                            icon={<InfoCircleOutlined />}
+                            style={{ backgroundColor: '#1890ff', color: 'white' }} // Blue button for Info
                         />
                         <Button
                             key={`edit-${record.id}`}
                             onClick={() => window.location.href = "/cms/kuis/edit/" + record.id}
                             icon={<EditOutlined />}
+                        />
+                        <Button
+                            key={`delete-${record.id}`}
+                            onClick={() => ModalPopup({
+                                title: "Apakah anda ingin hapus kuis ini?",
+                                onOk: () => deleteKuis(record.id),
+                                content: "Klik Ok untuk hapus data",
+                            }).showConfirm()}
+                            danger
+                            icon={<DeleteOutlined />}
                         />
                     </Space>
                 ),
@@ -173,7 +502,7 @@ const Kuis = () => {
                             <Search
                                 placeholder="Cari kuis"
                                 allowClear
-                                onChange={(e) => searchKuis(e)}
+                                onChange={searchKuis}
                                 style={{ width: 200 }}
                             />
                         </div>
@@ -198,17 +527,21 @@ const Kuis = () => {
                             {renderTable(completeKuisData, completeCurrentPage, completePageSize, setCompleteCurrentPage, setCompletePageSize)}
                         </TabPane>
                     </Tabs>
-
                 </div>
             </CmsTemplate>
 
-            {loading && <Loading/>}
+            {loading && <Loading />}
+
+            {/* Modal for detailed view */}
+            <KuisDetailModal
+                visible={isModalVisible}
+                onClose={handleOk}
+                kuis={selectedKuis}
+            />
         </Fragment>
     );
 };
 
 export default Kuis;
-
-
 
 

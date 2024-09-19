@@ -8,7 +8,7 @@ import {
 } from "../../../components/template/Notification";
 import Utils from "../../../utils/Utils";
 import ModalPopup from "../../../components/template/ConfirmModal";
-import { KUIS_API } from "../../../config/ApiConstants";
+import { EXAM_API } from "../../../config/ApiConstants";
 
 export const useFormExam = () => {
     const { id } = useParams();
@@ -50,7 +50,7 @@ export const useFormExam = () => {
     const fetchInitialData = async () => {
         try {
             const mataPelajaranRes = await api.get(
-                KUIS_API.getSubjectBaseOnGuru
+                EXAM_API.getSubjectBaseOnGuru
             );
             setMataPelajaranList(mataPelajaranRes.data.data);
         } catch (error) {
