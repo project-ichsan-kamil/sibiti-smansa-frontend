@@ -152,7 +152,7 @@ export const useFormExam = () => {
                 try {
                     const kuisRes = await api.get("/exam", {
                         params: {
-                            statusExam: "PUBLISH",
+                            statusExam: ["PUBLISH"],
                             examType: "KUIS",
                             subjectId: subjectId, // subjectId dari mata pelajaran yang dipilih
                         },
