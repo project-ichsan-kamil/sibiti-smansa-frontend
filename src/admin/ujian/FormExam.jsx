@@ -245,6 +245,7 @@ const FormExam = () => {
                                     ]}
                                 >
                                     <InputNumber
+                                        max={99}
                                         min={1}
                                         style={{ width: "100%" }}
                                         placeholder="Masukan Nilai KKM"

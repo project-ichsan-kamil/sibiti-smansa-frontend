@@ -29,6 +29,8 @@ export const useFormExam = () => {
 
     useEffect(() => {
         initializeForm();
+        form.setFieldValue("randomize", true)
+        form.setFieldValue("shareExam", false)
     }, [id]);
 
     const initializeForm = async () => {
@@ -67,15 +69,29 @@ export const useFormExam = () => {
         }
     };
 
-    const onFinish = (values) => {
-        ModalPopup({
-            title: "Apakah anda ingin simpan data ini?",
-            onOk: () => saveKuis(values),
-            content: "Klik Ok untuk simpan data",
-        }).showConfirm();
-    };
 
-    const saveKuis = async (values) => {
+    const checkStartDate = (startDate) => {
+        const now = new Date();
+        return new Date(startDate) < now;
+    };
+    
+    const onFinish = (values) => {
+        if (checkStartDate(values.startDate)) {
+            notification.error({
+                message: "Data Tidak Valid",
+                description: "Tanggal mulai sudah lewat dari waktu sekarang. Silakan periksa kembali data Anda.",
+            });         
+        } else {
+            ModalPopup({
+                title: "Apakah anda ingin simpan data ini?",
+                onOk: () => saveExam(values),
+                content: "Klik Ok untuk simpan data",
+            }).showConfirm();
+        }
+    };
+   
+
+    const saveExam = async (values) => {
         console.log(values);
         showLoading();
         try {
