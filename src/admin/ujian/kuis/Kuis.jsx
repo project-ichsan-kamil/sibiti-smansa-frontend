@@ -15,18 +15,31 @@ const { TabPane } = Tabs;
 const Kuis = () => {
     const [upcomingKuisData, setUpcomingKuisData] = useState([]);
     const [completeKuisData, setCompleteKuisData] = useState([]);
+    const [filteredUpcomingData, setFilteredUpcomingData] = useState([]);
+    const [filteredCompleteData, setFilteredCompleteData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [isModalVisible, setIsModalVisible] = useState(false); 
-    const [selectedKuis, setSelectedKuis] = useState(null); 
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [selectedKuis, setSelectedKuis] = useState(null);
 
     const [upcomingCurrentPage, setUpcomingCurrentPage] = useState(1);
     const [upcomingPageSize, setUpcomingPageSize] = useState(10);
     const [completeCurrentPage, setCompleteCurrentPage] = useState(1);
     const [completePageSize, setCompletePageSize] = useState(10);
 
+    const [activeTab, setActiveTab] = useState("1"); // Default tab is "1" (upcoming)
+
     useEffect(() => {
         getAllKuis();
     }, []);
+
+    useEffect(() => {
+        // Update filtered data based on search when activeTab changes
+        if (activeTab === "1") {
+            setFilteredUpcomingData(upcomingKuisData);
+        } else if (activeTab === "2") {
+            setFilteredCompleteData(completeKuisData);
+        }
+    }, [upcomingKuisData, completeKuisData, activeTab]);
 
     const getAllKuis = async () => {
         setLoading(true);
@@ -44,6 +57,8 @@ const Kuis = () => {
 
             setUpcomingKuisData(upcomingKuis);
             setCompleteKuisData(completeKuis);
+            setFilteredUpcomingData(upcomingKuis); // Set filtered data to all data initially
+            setFilteredCompleteData(completeKuis); // Set filtered data to all data initially
         } catch (error) {
             showErrorNotification(error, "Gagal mengambil data kuis");
         } finally {
@@ -55,7 +70,7 @@ const Kuis = () => {
         try {
             await api.delete(`/kuis/${id}`);
             showSuccessNotification("Kuis berhasil dihapus");
-            getAllKuis(); 
+            getAllKuis();
         } catch (error) {
             showErrorNotification(error, "Gagal menghapus kuis");
         }
@@ -105,7 +120,18 @@ const Kuis = () => {
     };
 
     const searchKuis = (e) => {
-        const searchText = e.target.value;
+        const searchText = e.target.value.toLowerCase();
+        if (activeTab === "1") { // If active tab is "Upcoming"
+            const filteredData = upcomingKuisData.filter(kuis =>
+                kuis.name.toLowerCase().includes(searchText)
+            );
+            setFilteredUpcomingData(filteredData);
+        } else if (activeTab === "2") { // If active tab is "Complete"
+            const filteredData = completeKuisData.filter(kuis =>
+                kuis.name.toLowerCase().includes(searchText)
+            );
+            setFilteredCompleteData(filteredData);
+        }
     };
 
     const renderTable = (data, currentPage, pageSize, setCurrentPage, setPageSize) => {
@@ -227,7 +253,13 @@ const Kuis = () => {
                         <Select
                             defaultValue="10"
                             style={{ width: 80 }}
-                            onChange={(value) => setUpcomingPageSize(value)}
+                            onChange={(value) => {
+                                if (activeTab === "1") {
+                                    setUpcomingPageSize(value);
+                                } else {
+                                    setCompletePageSize(value);
+                                }
+                            }}
                         >
                             <Option value="10">10</Option>
                             <Option value="25">25</Option>
@@ -245,14 +277,17 @@ const Kuis = () => {
                         </div>
                     </div>
 
-                    <Tabs defaultActiveKey="1">
+                    <Tabs
+                        defaultActiveKey="1"
+                        onChange={(key) => setActiveTab(key)} // Update activeTab on tab change
+                    >
                         <TabPane tab={
                             <span>
                                 <RocketOutlined className="mr-2" />
                                 Upcoming
                             </span>
                         } key="1">
-                            {renderTable(upcomingKuisData, upcomingCurrentPage, upcomingPageSize, setUpcomingCurrentPage, setUpcomingPageSize)}
+                            {renderTable(filteredUpcomingData, upcomingCurrentPage, upcomingPageSize, setUpcomingCurrentPage, setUpcomingPageSize)}
                         </TabPane>
                         <TabPane
                             tab={
@@ -261,7 +296,7 @@ const Kuis = () => {
                                     Complete
                                 </span>
                             } key="2">
-                            {renderTable(completeKuisData, completeCurrentPage, completePageSize, setCompleteCurrentPage, setCompletePageSize)}
+                            {renderTable(filteredCompleteData, completeCurrentPage, completePageSize, setCompleteCurrentPage, setCompletePageSize)}
                         </TabPane>
                     </Tabs>
                 </div>
@@ -280,5 +315,3 @@ const Kuis = () => {
 };
 
 export default Kuis;
-
-
