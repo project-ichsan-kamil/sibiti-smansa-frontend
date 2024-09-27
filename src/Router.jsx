@@ -17,6 +17,7 @@ import LoginUser from "./user/login/LoginUser";
 import ForgotPassword from "./user/forgot-password/ForgotPassword";
 import DashboardUser from "./user/dashboard/DashboardUser";
 import Absensi from "./user/absensi/Absensi";
+import SubmitSoal from "./admin/submit-soal/SubmitSoal";
 
 const routes = [
   {
@@ -84,7 +85,7 @@ const routes = [
     path: "/cms/kuis/edit/:id",
     element: (
       <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
-        {/* <FormKuis /> */}
+        <FormExam/>
       </PrivateRoute>
     ),
   },
@@ -112,6 +113,19 @@ const routes = [
       </PrivateRoute>
     ),
   },
+
+  // submit soal
+  {
+    path: "/cms/submit-soal/:id",
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
+        <SubmitSoal/>
+      </PrivateRoute>
+    ),
+  },
+
+  
+  //management user
   {
     path: "/cms/create-user",
     element: (

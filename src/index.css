@@ -22,4 +22,12 @@
   background-color: #2881CF; /* Warna saat di-hover */
 }
 
+.tox .tox-notification--error {
+  display: none !important;
+}
+
+.tox .tox-notification--info {
+  display: none !important;
+}
+
 

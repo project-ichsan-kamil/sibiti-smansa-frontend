@@ -5,7 +5,6 @@ import { BASE_URL } from '../../config/ApiConstants';
 const MyEditor = () => {
     const editorRef = useRef(null);
     const [displayContent, setDisplayContent] = useState(''); // State untuk menyimpan konten yang ditampilkan
-    const [imageUrl, setImageUrl] = useState(''); // State untuk menyimpan URL gambar yang ditampilkan
 
     const handleOkClick = () => {
         if (editorRef.current) {
@@ -15,9 +14,11 @@ const MyEditor = () => {
     };
 
     const uploadImage = (blobInfo, success, failure) => {
+        // Buat objek FormData dan tambahkan file blob
         const formData = new FormData();
         formData.append('file', blobInfo.blob(), blobInfo.filename());
 
+        // Mengirim permintaan POST ke server untuk mengunggah file
         fetch(`${BASE_URL.development}/upload/tinymce`, {
             method: 'POST',
             body: formData,
@@ -29,15 +30,29 @@ const MyEditor = () => {
             return response.json();
         })
         .then(data => {
-            setImageUrl(data.url); // Simpan URL gambar yang diupload
-            if (editorRef.current) {
-                editorRef.current.setContent(`<p>This is the initial content of the editor.</p>
-                                               <img src="${data.url}" alt="Uploaded Image" style="max-width: 100%;" />`); // Hanya menampilkan gambar yang diupload
+            // Pastikan respons berisi URL gambar
+            if (data.location) {
+                // Hapus gambar blob yang baru saja dimasukkan ke dalam editor
+                const editor = editorRef.current;
+                const imgElements = editor.dom.select('img');
+
+                imgElements.forEach(img => {
+                    if (img.src.startsWith('blob:')) {
+                        editor.dom.remove(img); // Hapus gambar blob dari editor
+                    }
+                });
+
+                // Sisipkan gambar dengan URL yang diterima dari server
+                editor.insertContent(`<img src="${data.location}" alt="Uploaded Image" />`);
+
+                success(data.location); // Beri tahu TinyMCE bahwa upload berhasil
+            } else {
+                failure('Gagal mengunggah gambar: URL tidak ditemukan.');
             }
-            success(data.url); // URL gambar yang diupload
         })
-        .catch(() => {
-            failure('Image upload failed');
+        .catch(error => {
+            console.error('Error uploading image:', error);
+            failure('Gagal mengunggah gambar.');
         });
     };
 
@@ -45,23 +60,22 @@ const MyEditor = () => {
         <>
             <Editor
                 tinymceScriptSrc="/tinymce/tinymce.min.js"
-                onInit={(evt, editor) => editorRef.current = editor}
+                onInit={(evt, editor) => (editorRef.current = editor)}
                 initialValue="<p>This is the initial content of the editor.</p>"
                 init={{
-                    height: 500,
+                    height: 300,
                     menubar: false,
                     plugins: [
                         'advlist autolink lists link image charmap print preview anchor',
                         'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount'
+                        'insertdatetime media table paste code help'
                     ],
                     toolbar: 'undo redo | formatselect | ' +
-                             'bold italic backcolor | alignleft aligncenter ' +
-                             'alignright alignjustify | bullist numlist outdent indent | ' +
-                             'removeformat | help',
-                    images_upload_url: `${BASE_URL.development}/upload/tinymce`, // URL untuk upload gambar
-                    images_upload_handler: uploadImage, // Fungsi upload gambar
-                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                             'bold italic | alignleft aligncenter ' +
+                             'alignright alignjustify | bullist numlist outdent indent',
+                    images_upload_handler: uploadImage, // Gunakan handler kustom untuk upload gambar
+                    paste_data_images: true, // Izinkan penempelan gambar langsung
+                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:12px }'
                 }}
             />
             <button onClick={handleOkClick}>OK</button>
@@ -76,4 +90,3 @@ const MyEditor = () => {
 };
 
 export default MyEditor;
-
