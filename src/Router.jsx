@@ -116,7 +116,7 @@ const routes = [
 
   // submit soal
   {
-    path: "/cms/submit-soal/:id",
+    path: "/cms/submit-soal/:examId/:questionNumber",
     element: (
       <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
         <SubmitSoal/>
