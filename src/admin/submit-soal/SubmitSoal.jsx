@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Button, Space, message, Card } from "antd";
+import { Form, Button, Space, notification} from "antd";
 import { SaveOutlined, EditOutlined } from "@ant-design/icons";
 import CmsTemplate from "../../components/template/CmsTemplate";
 import MyEditor from "./MyEditor"; 
@@ -119,8 +119,10 @@ const SubmitSoal = () => {
         };
 
         if (!dataToUpdate.key || dataToUpdate.key.trim() === "") {
-            message.error("Kunci jawaban tidak boleh kosong.");
-            setLoading(false);
+            notification.error({
+                message: "Error",
+                description: "Kunci jawaban tidak boleh kosong",
+            });
             return;
         }
     

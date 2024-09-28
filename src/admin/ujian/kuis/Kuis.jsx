@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { Table, Select, Input, Button, Space, Tabs, Tag, Tooltip } from "antd";
-import { DeleteOutlined, EditOutlined, CheckCircleTwoTone, RocketOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Table, Select, Input, Button, Space, Tabs, Tag, Tooltip, Menu, Dropdown, Modal  } from "antd";
+import { DeleteOutlined, EditOutlined, CheckCircleTwoTone, RocketOutlined, InfoCircleOutlined, DownOutlined , EyeOutlined,PlayCircleOutlined, EyeInvisibleOutlined  } from '@ant-design/icons';
 import Loading from "../../../components/template/Loading";
 import CmsTemplate from '../../../components/template/CmsTemplate';
 import ModalPopup from "../../../components/template/ConfirmModal";
@@ -8,7 +8,6 @@ import api from '../../../config/axios';
 import { showErrorNotification, showSuccessNotification } from '../../../components/template/Notification';
 import KuisDetailModal from "./KuisDetailModal"; // Import the modal component
 import { BiBookAdd } from "react-icons/bi";
-import MyEditor from "../../submit-soal/MyEditor";
 import Utils from "../../../utils/Utils";
 
 const { Option } = Select;
@@ -71,17 +70,24 @@ const Kuis = () => {
     };
 
     const deleteKuis = async (id) => {
-        showLoading()
-        try {
-            await api.delete(`/kuis/${id}`);
-            showSuccessNotification("Kuis berhasil dihapus");
-            getAllKuis();
-        } catch (error) {
-            showErrorNotification(error, "Gagal menghapus kuis");
-        }finally{
-            hideLoading()
-        }
+        showLoading();
+        await api.delete(`/exam`, {
+            params: {
+                id: id, 
+            },
+        })
+        .then(() => {
+            showSuccessNotification("Success","Kuis berhasil dihapus");
+            getAllKuis()
+        })
+        .catch((error) => {
+            showErrorNotification(error, "Gagal menghapus exam");
+        })
+        .finally(() => {
+            hideLoading();
+        });
     };
+    ;
 
     const showModal = (record) => {
         setSelectedKuis(record);
@@ -153,6 +159,67 @@ const Kuis = () => {
         }
       };
 
+      const toggleShowHide = (examId, currentStatus) => {
+        const newStatus = currentStatus === 'SHOW' ? 'DRAFT' : 'SHOW';
+        
+        // Show a confirmation modal
+        Modal.confirm({
+          title: `Apakah Anda yakin ingin ${newStatus === 'SHOW' ? 'menampilkan' : 'menyembunyikan'} kuis ini?`,
+          content: `Tindakan ini akan mengubah status kuis menjadi ${newStatus}.`,
+          okText: 'Ya',
+          cancelText: 'Batal',
+          onOk: async () => {
+            try {
+              showLoading();
+              await api.patch(`/exam/update-status`, null, {
+                params: {
+                  examId: examId,
+                  status: newStatus,
+                },
+              });
+      
+              showSuccessNotification("Success", `Status kuis berhasil diperbarui menjadi ${newStatus}`);
+              getAllKuis();
+            } catch (error) {
+              showErrorNotification(error, "Gagal mengubah status kuis");
+            } finally {
+              hideLoading();
+            }
+          },
+        });
+      };
+
+
+      const startKuis = (examId) => {
+        // Show a confirmation modal
+        Modal.confirm({
+          title: 'Apakah Anda yakin ingin memulai kuis ini?',
+          content: 'Setelah dimulai, kuis tidak dapat diubah lagi.',
+          okText: 'Ya',
+          cancelText: 'Batal',
+          onOk: async () => {
+            try {
+              showLoading();
+              
+              await api.patch(`/exam/update-status`, null, {
+                params: {
+                  examId: examId,
+                  status: 'PUBLISH',
+                },
+              });
+              
+              showSuccessNotification("Success", 'Kuis dimulai.');
+              getAllKuis();
+            } catch (error) {
+              showErrorNotification(error, "Gagal memulai kuis");
+            } finally {
+              hideLoading();
+            }
+          },
+        });
+      };
+      
+
     const renderTable = (data, currentPage, pageSize, setCurrentPage, setPageSize) => {
         const columns = [
             {
@@ -205,12 +272,15 @@ const Kuis = () => {
                 title: "Status",
                 dataIndex: "statusExam",
                 key: "statusExam",
-                render: (status) => (
+                render: (status) => {
+                  const displayStatus = status === 'PUBLISH' ? 'Sedang Berlangsung' : status;
+                  return (
                     <Tag color={getStatusColor(status)}>
-                        {status}
+                      {displayStatus}
                     </Tag>
-                ),
-            },
+                  );
+                },
+              },
             {
                 title: "Progress",
                 dataIndex: "progress",
@@ -228,45 +298,67 @@ const Kuis = () => {
                 title: "Action",
                 key: "action",
                 align: 'center',
-                render: (text, record) => (
-                  <Space size="small">
-                    <Tooltip title="Detail Kuis">
-                      <Button
-                        key={`info-${record.id}`}
-                        onClick={() => showModal(record)}
-                        icon={<InfoCircleOutlined />}
-                        style={{ backgroundColor: '#1890ff', color: 'white' }} // Blue button for Info
-                      />
-                    </Tooltip>
-                    <Tooltip title="Edit Kuis">
-                      <Button
-                        key={`edit-${record.id}`}
-                        onClick={() => window.location.href = "/cms/kuis/edit/" + record.id}
-                        icon={<EditOutlined />}
-                      />
-                    </Tooltip>
-                    <Tooltip title="Hapus Kuis">
-                      <Button
-                        key={`delete-${record.id}`}
-                        onClick={() => ModalPopup({
-                          title: "Apakah anda ingin hapus kuis ini?",
-                          onOk: () => deleteKuis(record.id),
-                          content: "Klik Ok untuk hapus data",
-                        }).showConfirm()}
-                        danger
-                        icon={<DeleteOutlined />}
-                      />
-                    </Tooltip>
-                    <Tooltip title="Submit Soal">
+                render: (text, record) => {
+                  const { statusExam } = record;
+              
+                  const menu = (
+                    <Menu>
+                      <Menu.Item key={`info-${record.id}`} onClick={() => showModal(record)}>
+                        <InfoCircleOutlined /> Detail Kuis
+                      </Menu.Item>
+                      <Menu.Item key={`edit-${record.id}`} onClick={() => window.location.href = "/cms/kuis/edit/" + record.id}>
+                        <EditOutlined /> Edit Kuis
+                      </Menu.Item>
+                      <Menu.Item key={`delete-${record.id}`} onClick={() => ModalPopup({
+                        title: "Apakah anda ingin hapus kuis ini?",
+                        onOk: () => deleteKuis(record.id),
+                        content: "Klik Ok untuk hapus data",
+                      }).showConfirm()}>
+                        <DeleteOutlined /> Hapus Kuis
+                      </Menu.Item>
+                    </Menu>
+                  );
+              
+                  return (
+                    <Space size="small">
+                      <Dropdown overlay={menu}>
+                        <Button>
+                          Actions <DownOutlined />
+                        </Button>
+                      </Dropdown>
+              
+                      <Tooltip title="Submit Soal">
                         <Button
-                        key={`submit-${record.id}`}
-                        onClick={() => submitQuestions(record.id)} // Panggil fungsi submitQuestions dengan ID kuis
-                        icon={<BiBookAdd />}
-                        style={{ backgroundColor: '#52c41a', color: 'white' }} // Custom color for submit action
+                          key={`submit-${record.id}`}
+                          onClick={() => submitQuestions(record.id)}
+                          icon={<BiBookAdd />}
+                          style={{ backgroundColor: '#52c41a', color: 'white' }} // Custom color for submit action
                         />
-                    </Tooltip>
-                  </Space>
-                ),
+                      </Tooltip>
+
+                      {activeTab === "1" && (
+                            <Tooltip title={statusExam === 'SHOW' ? 'Hide Kuis' : 'Show Kuis'}>
+                                <Button
+                                key={`show-${record.id}`}
+                                onClick={() => toggleShowHide(record.id, statusExam)}
+                                icon={statusExam === 'SHOW' ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                                disabled={statusExam === 'WAITING_SUBMITTER' || statusExam === 'PUBLISH'}
+                                />
+                            </Tooltip>
+                        )}
+                                
+                      <Tooltip title="Start Kuis">
+                        <Button
+                            type="primary"
+                          key={`start-${record.id}`}
+                          onClick={() => startKuis(record.id)}
+                          icon={<PlayCircleOutlined />}
+                          disabled={statusExam === 'WAITING_SUBMITTER' || statusExam === 'PUBLISH'}
+                        />
+                      </Tooltip>
+                    </Space>
+                  );
+                },
                 width: "10%", // Adjust width as needed
               }
         ];
