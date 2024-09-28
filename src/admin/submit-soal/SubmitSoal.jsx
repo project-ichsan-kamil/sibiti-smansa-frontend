@@ -355,7 +355,7 @@ const SubmitSoal = () => {
                                   onClick={saveQuestion}
                                   loading={loading}
                               >
-                                  Simpan Soal
+                                  Simpan
                               </Button>
                           </Space>
                       </Form.Item>

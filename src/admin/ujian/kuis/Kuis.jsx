@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { Table, Select, Input, Button, Space, Tabs, Tag } from "antd";
+import { Table, Select, Input, Button, Space, Tabs, Tag, Tooltip } from "antd";
 import { DeleteOutlined, EditOutlined, CheckCircleTwoTone, RocketOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import Loading from "../../../components/template/Loading";
 import CmsTemplate from '../../../components/template/CmsTemplate';
@@ -7,6 +7,9 @@ import ModalPopup from "../../../components/template/ConfirmModal";
 import api from '../../../config/axios';
 import { showErrorNotification, showSuccessNotification } from '../../../components/template/Notification';
 import KuisDetailModal from "./KuisDetailModal"; // Import the modal component
+import { BiBookAdd } from "react-icons/bi";
+import MyEditor from "../../submit-soal/MyEditor";
+import Utils from "../../../utils/Utils";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -17,7 +20,7 @@ const Kuis = () => {
     const [completeKuisData, setCompleteKuisData] = useState([]);
     const [filteredUpcomingData, setFilteredUpcomingData] = useState([]);
     const [filteredCompleteData, setFilteredCompleteData] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const {showLoading, hideLoading, loading} = Utils()
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedKuis, setSelectedKuis] = useState(null);
 
@@ -42,7 +45,7 @@ const Kuis = () => {
     }, [upcomingKuisData, completeKuisData, activeTab]);
 
     const getAllKuis = async () => {
-        setLoading(true);
+        showLoading()
         try {
             const upcomingResponse = await api.get('/exam', {
                 params: { statusExam: ['PUBLISH', 'DRAFT', 'WAITING_SUBMITTER', 'SHOW'], examType: "KUIS" }
@@ -54,6 +57,7 @@ const Kuis = () => {
 
             const upcomingKuis = upcomingResponse.data.data;
             const completeKuis = completeResponse.data.data;
+            console.log(upcomingKuis);
 
             setUpcomingKuisData(upcomingKuis);
             setCompleteKuisData(completeKuis);
@@ -62,17 +66,20 @@ const Kuis = () => {
         } catch (error) {
             showErrorNotification(error, "Gagal mengambil data kuis");
         } finally {
-            setLoading(false);
+            hideLoading()
         }
     };
 
     const deleteKuis = async (id) => {
+        showLoading()
         try {
             await api.delete(`/kuis/${id}`);
             showSuccessNotification("Kuis berhasil dihapus");
             getAllKuis();
         } catch (error) {
             showErrorNotification(error, "Gagal menghapus kuis");
+        }finally{
+            hideLoading()
         }
     };
 
@@ -134,6 +141,18 @@ const Kuis = () => {
         }
     };
 
+    const submitQuestions = async (recordId) => {
+        showLoading()
+        try {
+          const response = await api.post('/questions/create', { examId: recordId });
+          window.location.href =`/cms/submit-soal/${recordId}/1`
+        } catch (error) {
+          showErrorNotification(error, 'Gagal generate soal'); 
+        }finally{
+            hideLoading()
+        }
+      };
+
     const renderTable = (data, currentPage, pageSize, setCurrentPage, setPageSize) => {
         const columns = [
             {
@@ -193,36 +212,63 @@ const Kuis = () => {
                 ),
             },
             {
+                title: "Progress",
+                dataIndex: "progress",
+                key: "progress",
+                render: (progress) => {
+                    const color = progress.isComplete ? 'green' : 'red';
+                    return (
+                        <Tag color={color}>
+                            {progress.progress}
+                        </Tag>
+                    );
+                },
+            },
+            {
                 title: "Action",
                 key: "action",
                 align: 'center',
                 render: (text, record) => (
-                    <Space size="small">
+                  <Space size="small">
+                    <Tooltip title="Detail Kuis">
+                      <Button
+                        key={`info-${record.id}`}
+                        onClick={() => showModal(record)}
+                        icon={<InfoCircleOutlined />}
+                        style={{ backgroundColor: '#1890ff', color: 'white' }} // Blue button for Info
+                      />
+                    </Tooltip>
+                    <Tooltip title="Edit Kuis">
+                      <Button
+                        key={`edit-${record.id}`}
+                        onClick={() => window.location.href = "/cms/kuis/edit/" + record.id}
+                        icon={<EditOutlined />}
+                      />
+                    </Tooltip>
+                    <Tooltip title="Hapus Kuis">
+                      <Button
+                        key={`delete-${record.id}`}
+                        onClick={() => ModalPopup({
+                          title: "Apakah anda ingin hapus kuis ini?",
+                          onOk: () => deleteKuis(record.id),
+                          content: "Klik Ok untuk hapus data",
+                        }).showConfirm()}
+                        danger
+                        icon={<DeleteOutlined />}
+                      />
+                    </Tooltip>
+                    <Tooltip title="Submit Soal">
                         <Button
-                            key={`info-${record.id}`}
-                            onClick={() => showModal(record)}
-                            icon={<InfoCircleOutlined />}
-                            style={{ backgroundColor: '#1890ff', color: 'white' }} // Blue button for Info
+                        key={`submit-${record.id}`}
+                        onClick={() => submitQuestions(record.id)} // Panggil fungsi submitQuestions dengan ID kuis
+                        icon={<BiBookAdd />}
+                        style={{ backgroundColor: '#52c41a', color: 'white' }} // Custom color for submit action
                         />
-                        <Button
-                            key={`edit-${record.id}`}
-                            onClick={() => window.location.href = "/cms/kuis/edit/" + record.id}
-                            icon={<EditOutlined />}
-                        />
-                        <Button
-                            key={`delete-${record.id}`}
-                            onClick={() => ModalPopup({
-                                title: "Apakah anda ingin hapus kuis ini?",
-                                onOk: () => deleteKuis(record.id),
-                                content: "Klik Ok untuk hapus data",
-                            }).showConfirm()}
-                            danger
-                            icon={<DeleteOutlined />}
-                        />
-                    </Space>
+                    </Tooltip>
+                  </Space>
                 ),
-                width: "10%",
-            },
+                width: "10%", // Adjust width as needed
+              }
         ];
 
         return (
