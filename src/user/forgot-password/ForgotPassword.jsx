@@ -1,21 +1,48 @@
 import React, { useState } from 'react';
 import image from '../../assets/UserImage';
+import Utils from '../../utils/Utils';
+import { showErrorNotification, showSuccessNotification } from '../../components/template/Notification';
+import Loading from '../../components/template/Loading';
+import api from '../../config/axios';
 
 const ForgotPassword = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const {showLoading, hideLoading, loading} = Utils()
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    
+    if (error) {
+      setError('');
+    }
+
+    if (value.trim() === '') {
+      setError('Email tidak boleh kosong');
+    }
   };
 
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (email.trim() === '') {
+      setError('Email tidak boleh kosong');
+      return;
+    }
+
+    showLoading()
+    try {
+      const response = await api.post('/auth/forgot-password', { email });
+      showSuccessNotification("Success", response.data.message)
+    } catch (error) {
+      showErrorNotification(error, "Gagal mengirimkan email forgot password")
+    } finally {
+      hideLoading()
+    }
   };
 
   return (
     <div className="flex flex-col lg:flex-row h-screen">
-      {/* Left Section: Image with Text */}
       <div
         className="hidden w-80 lg:flex flex-grow flex-shrink items-center justify-center bg-cover bg-no-repeat bg-center"
         style={{ backgroundImage: `url(${image.welcome})` }}  
@@ -42,8 +69,8 @@ const ForgotPassword = () => {
             <p className="text-sm text-gray-400 font-normal text-justify">Jika Anda memerlukan bantuan untuk mengatur ulang password Anda, kami dapat membantu dengan mengirimkan Anda tautan untuk mengatur ulang password Anda.</p>
           </div>
           
-          <form className="space-y-4">
-            {/* New Password Field */}
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email
@@ -52,12 +79,14 @@ const ForgotPassword = () => {
                 <input
                   id="email"
                   name="email"
-                  type="text"
+                  type="email"
                   placeholder="Masukkan email"
-                  required
+                  value={email}
+                  onChange={handleEmailChange}
                   className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-offset-0 sm:text-sm"
                 />
               </div>
+              {error && <p className="text-red-500 text-xs">{error}</p>}
             </div>
             <div>
               <button
@@ -70,8 +99,11 @@ const ForgotPassword = () => {
           </form>
         </div>
       </div>
+
+      {loading && <Loading/>}
     </div>
   );
 };
 
 export default ForgotPassword;
+

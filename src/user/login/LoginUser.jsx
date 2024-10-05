@@ -149,15 +149,8 @@ const LoginUser = () => {
                     </div>
                     {error.password && <p className="text-red-500 text-xs">{error.password}</p>}
                   </div>
-                  <div className="flex items-center justify-between">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="form-checkbox text-blue-500 border-blue-500 rounded"
-                      />
-                      <span className="ml-2 text-sm text-gray-600">Ingat Saya</span>
-                    </label>
-                    <a href="#" className="text-sm text-active hover:text-hover">
+                  <div className="flex items-center justify-end">
+                    <a href="/forgot-password" className="text-sm text-active hover:text-hover">
                       Lupa Password?
                     </a>
                   </div>
