@@ -45,14 +45,7 @@ const routes = [
       </PrivateRoute>
     ),
   },
-
-
-
-  //cms
-  {
-    path: "/login",
-    element: <Login />,
-  },
+  
   {
     path: "/cms/dashboard",
     element: (
