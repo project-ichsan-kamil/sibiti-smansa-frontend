@@ -26,7 +26,7 @@ const routes = [
     errorElement: <ErrorPage />,
   },
   {
-    path: "/change-password",
+    path: "/change-password/:token",
     element: <ChangePassword />,
   },
   {

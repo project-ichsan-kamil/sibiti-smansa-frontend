@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import image from '../../assets/UserImage';
+import api from '../../config/axios'; // Pastikan untuk mengimpor axios
+import { useParams } from 'react-router-dom';
+import { showErrorNotification, showSuccessNotification } from '../../components/template/Notification';
+import Utils from '../../utils/Utils';
+import Loading from '../../components/template/Loading';
 
 const ChangePassword = () => {
+  const { token } = useParams(); 
+  const {showLoading, hideLoading, loading} = Utils()
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errorNewPassword, setErrorNewPassword] = useState('');
+  const [errorConfirmPassword, setErrorConfirmPassword] = useState('');
+
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -13,6 +25,81 @@ const ChangePassword = () => {
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+
+    // Reset error messages
+    setErrorNewPassword('');
+    setErrorConfirmPassword('');
+
+    // Validasi input
+    if (!newPassword.trim()) {
+      setErrorNewPassword('Password tidak boleh kosong');
+      return;
+    }
+
+    if (confirmPassword.trim() === "") {
+      setErrorConfirmPassword('Konfirmasi password tidak boleh kosong');
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      setErrorConfirmPassword('Password dan konfirmasi password tidak sama');
+      return;
+    }
+
+    try {
+      showLoading()
+      const response = await api.post(`/auth/change-password`, {
+        newPassword,
+      }, {
+        params: { token },
+      });
+      showSuccessNotification("Success", response.data.message)
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2000);
+    } catch (error) {
+      showErrorNotification(error, "Password gagal diubah" )
+    }finally{
+      hideLoading()
+    }
+
+  };
+
+  const handlePasswordChange = (e, isConfirmPassword = false) => {
+    const value = e.target.value;
+  
+    if (isConfirmPassword) {
+      setConfirmPassword(value);
+      
+      // Reset error jika ada
+      if (errorConfirmPassword) setErrorConfirmPassword('');
+  
+      // Validasi jika field kosong
+      if (value.trim() === '') {
+        setErrorConfirmPassword('Konfirmasi password tidak boleh kosong');
+      } else if (newPassword !== value) {
+        // Validasi jika password baru dan konfirmasi password tidak sama
+        setErrorConfirmPassword("Password harus sama");
+      } else {
+        // Jika password cocok, hilangkan pesan kesalahan
+        setErrorConfirmPassword('');
+      }
+    } else {
+      setNewPassword(value);
+      
+      // Reset error jika ada
+      if (errorNewPassword) setErrorNewPassword('');
+  
+      // Validasi jika field kosong
+      if (value.trim() === '') {
+        setErrorNewPassword('Password tidak boleh kosong');
+      }
+    }
+  };
+  
 
   return (
     <div className="flex flex-col lg:flex-row h-screen">
@@ -43,7 +130,7 @@ const ChangePassword = () => {
             <p className="text-sm text-gray-400 font-normal text-justify">Password baru Anda harus berbeda dengan password yang digunakan sebelumnya.</p>
           </div>
           
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleChangePassword}>
             {/* New Password Field */}
             <div>
               <label htmlFor="new-password" className="block text-sm font-medium text-gray-700">
@@ -55,7 +142,8 @@ const ChangePassword = () => {
                   name="new-password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Masukkan password baru"
-                  required
+                  value={newPassword}
+                  onChange={handlePasswordChange} 
                   className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-offset-0 sm:text-sm"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
@@ -68,6 +156,7 @@ const ChangePassword = () => {
                   </button>
                 </div>
               </div>
+              {errorNewPassword && <p className="text-red-500 text-xs">{errorNewPassword}</p>}
             </div>
 
             {/* Confirm New Password Field */}
@@ -81,7 +170,8 @@ const ChangePassword = () => {
                   name="confirm-password"
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Konfirmasi password baru"
-                  required
+                  value={confirmPassword}
+                  onChange={(e) => handlePasswordChange(e, true)}
                   className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-offset-0 sm:text-sm"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
@@ -94,6 +184,7 @@ const ChangePassword = () => {
                   </button>
                 </div>
               </div>
+              {errorConfirmPassword && <p className="text-red-500 text-xs">{errorConfirmPassword}</p>}
             </div>
 
             <div>
@@ -107,8 +198,11 @@ const ChangePassword = () => {
           </form>
         </div>
       </div>
+
+      {loading && <Loading/>}
     </div>
   );
 };
 
 export default ChangePassword;
+
