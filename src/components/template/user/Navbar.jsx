@@ -2,8 +2,15 @@ import React, { useState } from 'react';
 import { FaBell, FaBars, FaChevronDown, FaUser, FaKey, FaSignOutAlt } from 'react-icons/fa';
 import image from '../../../assets/UserImage';
 import NotificationCard from './NotificationCard';
+import { useNavigate } from 'react-router-dom';
+import { showSuccessNotification, showErrorNotification } from '../Notification';
+import Utils from '../../../utils/Utils';
+import Loading from '../Loading';
+import api from '../../../config/axios';
 
 const Navbar = ({ toggleSidebar }) => {
+  const navigate = useNavigate()
+  const {showLoading, hideLoading, loading} = Utils();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [notifications, setNotifications] = useState(3); // Misalnya ada 3 notifikasi
@@ -16,6 +23,22 @@ const Navbar = ({ toggleSidebar }) => {
   const toggleProfile = () => {
     setIsProfileOpen(!isProfileOpen);
     setIsNotificationOpen(false); // Close notification if profile is opened
+  };
+
+  const handleLogout = () => {
+    showLoading()
+    api.post("/auth/logout")
+      .then(() => {
+        showSuccessNotification("Logout berhasil", "Anda telah berhasil logout. Sampai jumpa lagi!" )
+        
+        navigate("/", { replace: true });
+      })
+      .catch((err) => {
+        showErrorNotification(err, "Logout gagal, harap coba lagi" )
+      })
+      .finally(() => {
+        hideLoading()
+      });
   };
 
   return (
@@ -33,7 +56,7 @@ const Navbar = ({ toggleSidebar }) => {
         
         {/* Notifikasi */}
         <div className="relative">
-          <div className="relative cursor-pointer" onClick={toggleNotification}>
+          <div className="relative cursor-pointer hidden" onClick={toggleNotification}>     //TODO show
             <FaBell className="text-2xl" />
             {/* Badge jumlah notifikasi */}
             {notifications > 0 && (
@@ -45,7 +68,7 @@ const Navbar = ({ toggleSidebar }) => {
 
           {/* Popup Notifikasi */}
           {isNotificationOpen && (
-            <div className="absolute -left-36 mt-2 w-80 bg-white shadow-lg rounded-lg p-4 z-50 max-w-xs">
+            <div className="absolute -left-36 mt-2 w-80 bg-white shadow-lg rounded-lg p-4 z-50 max-w-xs"> 
                 <h2 className="text-md font-semibold mb-2">Notifikasi</h2>
                 <div className="space-y-2 max-h-80 overflow-y-auto lg:pr-2"> {/* Tambahkan max-h dan overflow-y-auto */}
                     <NotificationCard
@@ -94,15 +117,17 @@ const Navbar = ({ toggleSidebar }) => {
           {isProfileOpen && (
             <div className="absolute right-0 mt-2 w-fit bg-white shadow-lg rounded-lg p-4 z-50">
             <ul className="space-y-2">
-              <li className="flex items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6 ">
+              <li className="items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6 hidden">  //TODO show
                 <FaUser />
                 <span>Profile</span>
               </li>
-              <li className="flex items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6">
+              <li className="items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6 hidden">   //TODO show
                 <FaKey />
                 <span>Password</span>
               </li>
-              <li className="flex items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6">
+              <li className="flex items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6 border border-active hover:cursor-pointer"
+                onClick={handleLogout}
+              >
                 <FaSignOutAlt />
                 <span>Keluar</span>
               </li>
@@ -111,6 +136,8 @@ const Navbar = ({ toggleSidebar }) => {
           )}
         </div>
       </div>
+
+      {loading && <Loading/>}
     </div>
   );
 };
