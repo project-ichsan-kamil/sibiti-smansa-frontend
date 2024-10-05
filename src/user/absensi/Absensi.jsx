@@ -63,7 +63,7 @@ const Absensi = () => {
           setLocationStatus('Gagal mendapatkan lokasi. Pastikan GPS aktif.');
           console.error('Error getting location:', error);
         },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 100 }
       );
     } else {
       setLocationStatus('Geolocation tidak didukung di browser ini.');
@@ -89,17 +89,24 @@ const Absensi = () => {
   };
 
   const handleSave = async () => {
-    const payload = {
-      latitude: position[0].toString(),
-      longitude: position[1].toString(),
-      status: status,
-      notes: notes,
-      image: image ? image.name : null 
-    };
+    const formData = new FormData(); // Buat FormData untuk meng-upload file
+
+    // Menambahkan data ke FormData
+    formData.append('latitude', position[0].toString());
+    formData.append('longitude', position[1].toString());
+    formData.append('status', status);
+    formData.append('notes', notes);
+    if (image) {
+      formData.append('file', image); // Menggunakan 'file' sebagai nama field untuk file
+    }
   
     try {
       showLoading()
-      const response = await api.post('/absents', payload);
+      const response = await api.post('/absents', formData ,{
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       showSuccessNotification("Success", "Absensi berhasil")
       checkTodayStatus();
     } catch (error) {
@@ -164,13 +171,13 @@ const Absensi = () => {
                  color={
                    todayStatus === 'LATE' ? 'red' :
                    todayStatus === 'PRESENT' ? 'green' :
-                   todayStatus === 'EXCUSED' ? 'gold' : 'default'
+                   todayStatus === 'EXCUSED' ? 'gold' : 'blue'
                  }
                  className="rounded-lg py-1 text-sm font-semibold px-8"
                >
                  {todayStatus === 'LATE' ? 'Terlambat' :
                   todayStatus === 'PRESENT' ? 'Hadir' :
-                  todayStatus === 'EXCUSED' ? 'Izin' : ''}
+                  todayStatus === 'EXCUSED' ? 'Izin' : 'Sakit'}
                </Tag>
                
               ) : (

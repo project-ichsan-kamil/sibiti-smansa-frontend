@@ -39,7 +39,11 @@ const routes = [
   },
   {
     path: "/absensi",
-    element: <Absensi/>,
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU, Roles.SISWA]}>
+        <Absensi />
+      </PrivateRoute>
+    ),
   },
 
 

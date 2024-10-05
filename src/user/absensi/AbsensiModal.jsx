@@ -1,8 +1,18 @@
 import React from 'react';
-import { Modal, Select, Input, Button, Upload } from 'antd';
+import { Modal, Select, Input, Button, Upload, Form, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 
 const AbsensiModal = ({ visible, onClose, currentDate, currentTime, status, setStatus, notes, setNotes, image, setImage, handleSave, isAccurateEnough }) => {
+
+  const onFinish = () => {
+    if ((status === 'SICK' || status === 'EXCUSED') && (!notes || !image)) {
+      message.error("Catatan dan lampiran harus diisi!");
+      return; 
+    }
+
+    handleSave();
+  };
+
   return (
     <Modal
       visible={visible}
@@ -30,60 +40,71 @@ const AbsensiModal = ({ visible, onClose, currentDate, currentTime, status, setS
         </table>
       </div>
 
-      {/* Status Dropdown */}
-      <div className="my-4">
-        <label className="block mb-2 text-sm font-medium text-gray-700">Status:</label>
-        <Select
-          value={status}
-          onChange={(value) => setStatus(value)}
-          className="w-full"
-        >
-          <Select.Option value="PRESENT">HADIR</Select.Option>
-          <Select.Option value="IZIN">IZIN</Select.Option>
-          <Select.Option value="SAKIT">SAKIT</Select.Option>
-        </Select>
-      </div>
+      {/* Form */}
+      <Form layout="vertical" onFinish={onFinish}>
+        {/* Status Dropdown */}
+        <Form.Item label="Status" required>
+          <Select
+            value={status}
+            onChange={(value) => setStatus(value)}
+            className="w-full"
+          >
+            <Select.Option value="PRESENT">HADIR</Select.Option>
+            <Select.Option value="EXCUSED">IZIN</Select.Option>
+            <Select.Option value="SICK">SAKIT</Select.Option>
+          </Select>
+        </Form.Item>
 
-      {/* Notes and Image input for Izin and Sakit */}
-      {(status === 'IZIN' || status === 'SAKIT') && (
-        <>
-          <div className="my-4">
-            <label className="block mb-2 text-sm font-medium text-gray-700">Catatan:</label>
-            <Input.TextArea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-              placeholder="Tambahkan catatan..."
-            />
-          </div>
-          <div className="my-4">
-            <label className="block mb-2 text-sm font-medium text-gray-700">Bukti (Gambar):</label>
-            <Upload
-              beforeUpload={(file) => {
-                setImage(file);
-                return false; // Prevent automatic upload
-              }}
-              accept="image/*"
+        {/* Notes and Image input for Izin and Sakit */}
+        {(status === 'SICK' || status === 'EXCUSED') && (
+          <>
+            <Form.Item
+              label="Catatan"
+              required
+              rules={[{ required: true, message: 'Catatan harus diisi!' }]}
             >
-              <Button icon={<UploadOutlined />}>Pilih Gambar</Button>
-            </Upload>
-          </div>
-        </>
-      )}
+              <Input.TextArea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+                placeholder="Tambahkan catatan..."
+              />
+            </Form.Item>
 
-      {/* Save/Absen Button */}
-      <div className="mt-6 flex justify-end">
-        <Button
-          type="primary"
-          className="w-full rounded-full"
-          onClick={handleSave}
-          disabled={status === 'HADIR' && !isAccurateEnough}
-        >
-          Save
-        </Button>
-      </div>
+            <Form.Item
+              label="Lampiran"
+              required
+              rules={[{ required: true, message: 'Bukti gambar harus di-upload!' }]}
+            >
+              <Upload
+                beforeUpload={(file) => {
+                  setImage(file);
+                  return false; // Prevent automatic upload
+                }}
+                accept="*/*"
+              >
+                <Button icon={<UploadOutlined />}>Pilih Gambar</Button>
+              </Upload>
+            </Form.Item>
+          </>
+        )}
+
+        {/* Save/Absen Button */}
+        {console.log(isAccurateEnough)}
+        <Form.Item>
+          <Button
+            type="primary"
+            className="w-full rounded-full"
+            htmlType="submit" // Mengubah tombol untuk submit form
+            disabled={status === 'HADIR' && !isAccurateEnough}
+          >
+            Simpan
+          </Button>
+        </Form.Item>
+      </Form>
     </Modal>
   );
 };
 
 export default AbsensiModal;
+
