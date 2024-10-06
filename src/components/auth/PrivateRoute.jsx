@@ -3,8 +3,10 @@ import { Navigate } from "react-router-dom";
 import api from "../../config/axios";
 import { AUTH_API } from "../../config/ApiConstants";
 import Loading from "../template/Loading";
+import { useAuthContext } from "../../context/useContext";
 
-const PrivateRoute = ({ children, allowedRoles }) => {              
+const PrivateRoute = ({ children, allowedRoles }) => {   
+  const {currentUser ,setCurrentUser} = useAuthContext()           
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userRoles, setUserRoles] = useState([]);
@@ -14,6 +16,7 @@ const PrivateRoute = ({ children, allowedRoles }) => {
       .then((response) => {
         setIsAuthenticated(true);
         setUserRoles(response.data.roles || []);
+        setCurrentUser({ ...currentUser, fullName: response.data.fullName, roles: response.data.roles });
       })
       .catch(() => {
         setIsAuthenticated(false);
