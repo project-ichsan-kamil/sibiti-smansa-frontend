@@ -63,7 +63,7 @@ const LoginUser = () => {
 
     setIsLoading(true);
     try {
-      const response = await api.post(AUTH_API.login, data);
+      const response = await api.post("/auth/login", data);
       await checkAuthRole();
     } catch (error) {
       showErrorNotification(error, "Login failed. Please try again.")

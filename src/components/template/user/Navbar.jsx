@@ -7,9 +7,11 @@ import { showSuccessNotification, showErrorNotification } from '../Notification'
 import Utils from '../../../utils/Utils';
 import Loading from '../Loading';
 import api from '../../../config/axios';
+import { useAuthContext } from '../../../context/useContext';
 
 const Navbar = ({ toggleSidebar }) => {
   const navigate = useNavigate()
+  const { currentUser } = useAuthContext();
   const {showLoading, hideLoading, loading} = Utils();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -109,7 +111,7 @@ const Navbar = ({ toggleSidebar }) => {
               alt="User Avatar"
               className="w-10 h-10 rounded-full"
             />
-            <span className="ml-2 text-sm">Kirana Anjani</span> {/* Nama user */}
+            <span className="ml-2 text-sm">{currentUser.fullName}</span> 
             <FaChevronDown className="ml-1 text-xs" /> {/* Ikon dropdown */}
           </div>
           
