@@ -1,15 +1,17 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FaHome, FaClipboardList, FaCalendarAlt, FaBook, FaUserCheck, FaCalendar, FaTimes } from 'react-icons/fa';
 import image from '../../../assets/UserImage';
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
   const location = useLocation(); 
+  const navigate = useNavigate();
 
   const menuItems = [
     { path: '/dashboard', label: 'Dashboard', icon: <FaHome /> , hidden : true},
     { path: '/absensi', label: 'Absensi', icon: <FaUserCheck />, hidden: false},
+    { path: '/riwayat-absensi', label: 'Riwayat Absensi', icon: <FaCalendar />, hidden: false},
     { path: '/kuis', label: 'Kuis', icon: <FaClipboardList />, hidden: true },
     { path: '/ulangan-harian', label: 'Ulangan Harian', icon: <FaClipboardList />, hidden: true},
     { path: '/ujian-tengah-semester', label: 'Ujian Tengah Semester', icon: <FaCalendarAlt />, hidden: true},
@@ -49,7 +51,8 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
                 key={path}
                 className={`${hidden ? "hidden" : "flex"} items-center space-x-2 text-sm font-semibold p-2 px-4 rounded-lg transition-colors duration-300 ${
                   location.pathname.includes(path) ? 'bg-active text-white' : 'hover:bg-active hover:text-white' 
-                }`}
+                } hover:cursor-pointer`}
+                onClick={() => navigate(`${path}`, { replace: true })}
               >
                 {icon}
                 <span>{label}</span>

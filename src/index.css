@@ -31,3 +31,55 @@
 }
 
 
+/* hide calendar month and year */
+/* Custom styles to hide month/year selector */
+.ant-picker-calendar-header .ant-picker-calendar-mode-switch {
+  display: none;
+}
+
+.ant-picker-calendar-header .ant-picker-header-view {
+  display: none;
+}
+
+.ant-picker-calendar-header{
+  display: none;
+}
+
+
+/* custom calendar */
+:where(.css-dev-only-do-not-override-mzwlov).ant-picker-calendar.ant-picker-calendar-full .ant-picker-calendar-date {
+  display: block;
+  width: auto;
+  height: 80px; /* Adjust height as needed */
+  margin: 0 3px;
+  padding: 0;
+  border: 0;
+  border-top: 2px solid rgba(5, 5, 5, 0.06); /* Top border for separation */
+  border-radius: 0;
+}
+
+@media (min-width: 768px) { 
+  :where(.css-dev-only-do-not-override-mzwlov).ant-picker-calendar.ant-picker-calendar-full .ant-picker-calendar-date {
+    height: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  :where(.css-dev-only-do-not-override-mzwlov).ant-picker-calendar.ant-picker-calendar-full .ant-picker-calendar-date {
+    height: 80px; 
+  }
+}
+
+/* Optional: Adjust hover effects */
+.ant-picker-calendar .ant-picker-calendar-date:hover {
+  background-color: rgba(5, 5, 5, 0.1); /* Change background on hover */
+}
+
+:where(.css-dev-only-do-not-override-mzwlov).ant-picker-calendar.ant-picker-calendar-full .ant-picker-calendar-date-value {
+  text-align: left;
+}
+
+
+
+
+

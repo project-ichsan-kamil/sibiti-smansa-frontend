@@ -18,6 +18,7 @@ import ForgotPassword from "./user/forgot-password/ForgotPassword";
 import DashboardUser from "./user/dashboard/DashboardUser";
 import Absensi from "./user/absensi/Absensi";
 import SubmitSoal from "./admin/submit-soal/SubmitSoal";
+import RiwayatAbsensi from "./user/riwayat-absen/RiwayatAbsensi";
 
 const routes = [
   {
@@ -42,6 +43,14 @@ const routes = [
     element: (
       <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU, Roles.SISWA]}>
         <Absensi />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/riwayat-absensi",
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU, Roles.SISWA]}>
+        <RiwayatAbsensi />
       </PrivateRoute>
     ),
   },
