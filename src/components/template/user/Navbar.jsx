@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaBell, FaBars, FaChevronDown, FaUser, FaKey, FaSignOutAlt } from 'react-icons/fa';
+import { FaBell, FaBars, FaChevronDown, FaUser, FaKey, FaSignOutAlt, FaTh } from 'react-icons/fa';
 import image from '../../../assets/UserImage';
 import NotificationCard from './NotificationCard';
 import { useNavigate } from 'react-router-dom';
@@ -107,34 +107,43 @@ const Navbar = ({ toggleSidebar }) => {
         <div className="relative">
           <div className="flex items-center cursor-pointer" onClick={toggleProfile}>
             <img
-              src={image.smansa} // Ganti dengan URL foto user
+              src={image.smansa}    //TOOD change profile
               alt="User Avatar"
               className="w-10 h-10 rounded-full"
             />
             <span className="ml-2 text-sm">{currentUser.fullName}</span> 
-            <FaChevronDown className="ml-1 text-xs" /> {/* Ikon dropdown */}
+            <FaChevronDown
+                    className={`ml-1 text-xs transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} 
+                />
           </div>
           
           {/* Dropdown Menu */}
           {isProfileOpen && (
-            <div className="absolute right-0 mt-2 w-fit bg-white shadow-lg rounded-lg p-4 z-50">
-            <ul className="space-y-2">
-              <li className="items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6 hidden">  //TODO show
-                <FaUser />
-                <span>Profile</span>
-              </li>
-              <li className="items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6 hidden">   //TODO show
-                <FaKey />
-                <span>Password</span>
-              </li>
-              <li className="flex items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6 border border-active hover:cursor-pointer"
-                onClick={handleLogout}
-              >
-                <FaSignOutAlt />
-                <span>Keluar</span>
-              </li>
-            </ul>
-          </div>
+              <div className="absolute right-0 mt-2 w-auto bg-white shadow-lg rounded-lg p-4 z-50">
+                <ul className="space-y-2">
+                  {['ADMIN', 'GURU', 'SUPER_ADMIN'].some(role => currentUser.roles.includes(role)) && (
+                      <li className="flex items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6 border border-active hover:cursor-pointer"
+                      onClick={() => window.location.href = '/cms/dashboard'}>
+                          <FaTh />
+                          <span>Dashboard</span>
+                      </li>
+                  )}
+                  <li className="items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6 hidden">  //TODO show
+                    <FaUser />
+                    <span>Profile</span>
+                  </li>
+                  <li className="items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6 hidden">   //TODO show
+                    <FaKey />
+                    <span>Password</span>
+                  </li>
+                  <li className="flex items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6 border border-active hover:cursor-pointer"
+                    onClick={handleLogout}
+                  >
+                    <FaSignOutAlt />
+                    <span>Keluar</span>
+                  </li>
+                </ul>
+              </div>
           )}
         </div>
       </div>
