@@ -55,80 +55,83 @@ const routes = [
     ),
   },
   
-  {
-    path: "/cms/dashboard",
-    element: (
-      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
-        <Dashboard />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: "/cms/kelas",
-    element: (
-      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN]}>
-        <Kelas />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: "/cms/kuis",
-    element: (
-      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
-        <Kuis />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: "/cms/kuis/add",
-    element: (
-      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
-        <FormExam />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: "/cms/kuis/edit/:id",
-    element: (
-      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
-        <FormExam/>
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: "/cms/uh/add",
-    element: (
-      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
-        <FormExam />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: "/cms/uts/add",
-    element: (
-      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN]}>
-        <FormExam />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: "/cms/uas/add",
-    element: (
-      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN]}>
-        <FormExam />
-      </PrivateRoute>
-    ),
-  },
 
-  // submit soal
-  {
-    path: "/cms/submit-soal/:examId/:questionNumber",
-    element: (
-      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
-        <SubmitSoal/>
-      </PrivateRoute>
-    ),
-  },
+  // sub ujian 
+
+  // {
+  //   path: "/cms/dashboard",
+  //   element: (
+  //     <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
+  //       <Dashboard />
+  //     </PrivateRoute>
+  //   ),
+  // },
+  // {
+  //   path: "/cms/kelas",
+  //   element: (
+  //     <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN]}>
+  //       <Kelas />
+  //     </PrivateRoute>
+  //   ),
+  // },
+  // {
+  //   path: "/cms/kuis",
+  //   element: (
+  //     <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
+  //       <Kuis />
+  //     </PrivateRoute>
+  //   ),
+  // },
+  // {
+  //   path: "/cms/kuis/add",
+  //   element: (
+  //     <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
+  //       <FormExam />
+  //     </PrivateRoute>
+  //   ),
+  // },
+  // {
+  //   path: "/cms/kuis/edit/:id",
+  //   element: (
+  //     <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
+  //       <FormExam/>
+  //     </PrivateRoute>
+  //   ),
+  // },
+  // {
+  //   path: "/cms/uh/add",
+  //   element: (
+  //     <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
+  //       <FormExam />
+  //     </PrivateRoute>
+  //   ),
+  // },
+  // {
+  //   path: "/cms/uts/add",
+  //   element: (
+  //     <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN]}>
+  //       <FormExam />
+  //     </PrivateRoute>
+  //   ),
+  // },
+  // {
+  //   path: "/cms/uas/add",
+  //   element: (
+  //     <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN]}>
+  //       <FormExam />
+  //     </PrivateRoute>
+  //   ),
+  // },
+
+  // // submit soal
+  // {
+  //   path: "/cms/submit-soal/:examId/:questionNumber",
+  //   element: (
+  //     <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
+  //       <SubmitSoal/>
+  //     </PrivateRoute>
+  //   ),
+  // },
 
   
   //management user

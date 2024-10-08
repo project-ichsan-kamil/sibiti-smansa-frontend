@@ -39,31 +39,37 @@ const Sidebar = () => {
       key: '/cms/dashboard',
       icon: <MailOutlined />,
       label: <Link to="/cms/dashboard">Dashboard</Link>,
+      hide: true, // Example of adding hide property
     },
     {
       key: '/cms/kuis',
       icon: <AppstoreOutlined />,
       label: <Link to="/cms/kuis">Kuis</Link>,
+      hide: true, // Set to true to hide
     },
     {
       key: '/cms/ulangan-harian',
       icon: <AppstoreOutlined />,
       label: <Link to="/cms/ulangan-harian">Ulangan Harian</Link>,
+      hide: true, // Set to true to hide
     },
     {
       key: '/cms/uts',
       icon: <AppstoreOutlined />,
       label: <Link to="/cms/uts">UTS</Link>,
+      hide: true, // Set to true to hide
     },
     {
       key: '/cms/uas',
       icon: <AppstoreOutlined />,
       label: <Link to="/cms/uas">UAS</Link>,
+      hide: true, // Set to true to hide
     },
     {
       key: '/cms/kelola-siswa',
       icon: <MailOutlined />,
       label: 'Kelola Siswa',
+      hide: true, // Set to true to hide
     },
   ];
 
@@ -74,11 +80,13 @@ const Sidebar = () => {
         key: '/cms/mata-pelajaran',
         icon: <MailOutlined />,
         label: <Link to="/cms/mata-pelajaran">Mata Pelajaran</Link>,
+        hide: false, // Set to true to hide
       },
       {
         key: '/cms/kelas',
         icon: <MailOutlined />,
         label: <Link to="/cms/kelas">Kelas</Link>,
+        hide: false, // Set to true to hide
       }
     );
   }
@@ -86,11 +94,11 @@ const Sidebar = () => {
   // Conditionally add Management Role items based on roles
   if (hasAnyRole([Roles.ADMIN, Roles.SUPER_ADMIN])) {
     const managementRoleItems = [
-      { key: '/cms/management-role/guru', label: <Link to="/cms/management-role/guru">Guru</Link> },
+      { key: '/cms/management-role/guru', label: <Link to="/cms/management-role/guru">Guru</Link>, hide: false }, // Set to true to hide
     ];
 
     if (hasRole(Roles.SUPER_ADMIN)) {
-      managementRoleItems.unshift({ key: '/cms/management-role/admin', label: <Link to="/cms/management-role/admin">Admin</Link> });
+      managementRoleItems.unshift({ key: '/cms/management-role/admin', label: <Link to="/cms/management-role/admin">Admin</Link>, hide: false }); // Set to true to hide
     }
 
     baseItems.push({
@@ -107,8 +115,12 @@ const Sidebar = () => {
       key: '/cms/create-user',
       icon: <LinkOutlined />,
       label: <Link to="/cms/create-user">Create User</Link>,
+      hide: false, // Set to true to hide
     });
   }
+
+  // Filter out items that should be hidden
+  const visibleItems = baseItems.filter(item => !item.hide);
 
   return (
     <Menu
@@ -116,7 +128,7 @@ const Sidebar = () => {
       selectedKeys={[selectedKey]}
       mode="inline"
       theme="light"
-      items={baseItems}
+      items={visibleItems}
     />
   );
 };
