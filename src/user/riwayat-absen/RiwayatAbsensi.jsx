@@ -4,6 +4,7 @@ import { Calendar, Modal, Select } from 'antd';
 import { format, isSameDay } from 'date-fns';
 import UserTemplate from '../../components/template/user/UserTemplate';
 import api from '../../config/axios';
+import { id } from 'date-fns/locale';
 
 const RiwayatAbsensi = () => {
   const [events, setEvents] = useState([]);
@@ -65,6 +66,22 @@ const RiwayatAbsensi = () => {
         return 'gray';
     }
   };
+
+  const convertStatus = (status) => {
+    switch (status) {
+        case 'PRESENT':
+            return 'HADIR';
+        case 'SICK':
+            return 'SAKIT';
+        case 'LATE':
+            return 'TERLAMBAT';
+        case 'EXCUSED':
+            return 'IZIN';
+        default:
+            return status;
+    }
+};
+
   
 
   const customHeaderRender = ({ value, onChange }) => {
@@ -85,27 +102,27 @@ const RiwayatAbsensi = () => {
     ];
 
     return (
-      <div style={{ display: 'flex', padding: '10px', gap: '10px' }}>
+      <div className='flex py-2 space-x-2'>
         <Select
+          className='w-1/2 md:w-32'
           value={value.year()}
           onChange={(newYear) => {
             setSelectedYear(newYear); // Update state for year
             const newValue = value.clone().year(newYear);
             onChange(newValue);
           }}
-          style={{ width: 100 }}
         >
           {yearOptions}
         </Select>
 
         <Select
+          className='w-1/2 md:w-36'
           value={value.month()}
           onChange={(newMonth) => {
             setSelectedMonth(newMonth + 1); // Update state for month
             const newValue = value.clone().month(newMonth);
             onChange(newValue);
           }}
-          style={{ width: 120 }}
         >
           {months.map((month, index) => (
             <Select.Option key={index} value={index}>
@@ -121,7 +138,7 @@ const RiwayatAbsensi = () => {
     <Fragment>
       <UserTemplate>
         <div>
-          <h1>Riwayat Absensi</h1>
+          <h1 className='text-lg font-semibold'>Riwayat Absensi</h1>
           <Calendar
             onSelect={handleDateClick}
             headerRender={customHeaderRender}
@@ -142,25 +159,77 @@ const RiwayatAbsensi = () => {
           />
 
 
-          <Modal
-            title={`Absensi pada ${selectedDate ? format(selectedDate, 'PP') : ''}`}
-            visible={modalVisible}
-            onCancel={handleModalClose}
-            footer={null}
-          >
-            {attendanceDetails.length > 0 ? (
-              <ul>
-                {attendanceDetails.map((detail) => (
-                  <li key={detail.id}>
-                    <p>{`Waktu: ${format(new Date(detail.date), 'HH:mm')}`}</p>
-                    <p>{`Status: ${detail.status}`}</p>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>Tidak ada absensi pada tanggal ini.</p>
-            )}
-          </Modal>
+<Modal
+  title={<div style={{ textAlign: 'center' }}>Detail Absensi</div>} 
+  visible={modalVisible}
+  onCancel={handleModalClose}
+  footer={null}
+>
+{attendanceDetails.length > 0 ? (
+    <div>
+      {attendanceDetails.map((detail) => {
+        const currentDate = format(new Date(detail.date), 'dd MMMM yyyy', { locale: id });
+        const currentTime = format(new Date(detail.date), 'HH:mm'); // Format jam
+        return (
+          <div key={detail.id} style={{ marginBottom: '20px' }}>
+            <div className="mb-4 text-gray-500">
+              <table className="w-full">
+                <tbody>
+                  <tr>
+                    <td className="font-normal">Tanggal</td>
+                    <td>:</td>
+                    <td className="font-semibold">{currentDate}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-normal">Jam</td>
+                    <td>:</td>
+                    <td className="font-semibold">{currentTime}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-normal">Status</td>
+                    <td>:</td>
+                    <td className="font-semibold">{convertStatus(detail.status)}</td>
+                  </tr>
+                  {detail.notes && (
+                    <tr>
+                      <td className="font-normal">Catatan</td>
+                      <td>:</td>
+                      <td className="font-semibold">{detail.notes}</td>
+                    </tr>
+                  )}
+                  {detail.urlFile && (
+                    <tr>
+                      <td className="font-normal">File</td>
+                      <td>:</td>
+                      <td className="font-semibold">
+                        <a href={detail.urlFile} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                          Lihat File
+                        </a>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <iframe
+              src={`https://www.google.com/maps?q=${detail.latitude},${detail.longitude}&z=15&output=embed`}
+              width="100%"
+              height="300" // Adjust the height as needed
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+        );
+      })}
+    </div>
+  ) : (
+    <p className='text-center my-10'>Tidak ada absensi pada tanggal ini.</p>
+  )}
+
+</Modal>
+
+
         </div>
       </UserTemplate>
     </Fragment>
