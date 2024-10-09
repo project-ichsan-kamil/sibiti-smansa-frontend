@@ -19,6 +19,8 @@ import DashboardUser from "./user/dashboard/DashboardUser";
 import Absensi from "./user/absensi/Absensi";
 import SubmitSoal from "./admin/submit-soal/SubmitSoal";
 import RiwayatAbsensi from "./user/riwayat-absen/RiwayatAbsensi";
+import AbsensiSiswa from "./admin/absensi/AbsensiSiswa";
+import AbsensiGuruTable from "./admin/absensi/AbsensiGuruTable";
 
 const routes = [
   {
@@ -38,6 +40,9 @@ const routes = [
     path: "/dashboard",
     element: <DashboardUser />,
   },
+
+
+  //sub absensi
   {
     path: "/absensi",
     element: (
@@ -54,10 +59,27 @@ const routes = [
       </PrivateRoute>
     ),
   },
+
+  //sub absensi cms
+  {
+    path: "/cms/absensi/guru",
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN]}>
+        <AbsensiGuruTable/>
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/cms/absensi/siswa",
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
+        <AbsensiSiswa />
+      </PrivateRoute>
+    ),
+  },
   
 
   // sub ujian 
-
   // {
   //   path: "/cms/dashboard",
   //   element: (
