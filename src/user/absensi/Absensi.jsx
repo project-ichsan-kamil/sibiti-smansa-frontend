@@ -9,7 +9,7 @@ import AbsensiModal from './AbsensiModal';
 
 const Absensi = () => {
   const { showLoading, hideLoading, loading } = Utils();
-  const [position, setPosition] = useState([51.505, -0.09]); //TODO Change default
+  const [position, setPosition] = useState([-6.129823, 106.879966]); // Koordinat pusat absensi
   const [accuracy, setAccuracy] = useState(null);
   const [locationStatus, setLocationStatus] = useState('Mengambil lokasi...');
   const [statusBgColor, setStatusBgColor] = useState('bg-gray-500'); // Default background color (gray)
@@ -27,6 +27,8 @@ const Absensi = () => {
   const [todayDate, setTodayDate] = useState('');
   const [todayTime, setTodayTime] = useState('')
 
+  const CENTER_COORDS = { latitude: -6.129823, longitude: 106.879966 };
+  const RADIUS = 300; // Radius 300 meter
 
   const getLocation = () => {
     if ('geolocation' in navigator) {
@@ -39,25 +41,19 @@ const Absensi = () => {
 
           console.log('Latitude:', latitude, 'Longitude:', longitude, 'Accuracy:', accuracy);
 
-          // Mengecek akurasi dan menampilkan status
-          if (accuracy <= 100) {
-            setIsAccurateEnough(true);
-            setStatusBgColor('bg-green-500'); // Hijau untuk akurat
-            setLocationStatus('Lokasi sangat akurat. Siap untuk absen.');
-          } else if (accuracy > 100 && accuracy <= 350) {
-            setIsAccurateEnough(true);
-            setStatusBgColor('bg-yellow-500'); // Kuning untuk cukup akurat
-            setLocationStatus('Lokasi cukup akurat.');
-          } else if (accuracy > 350 && accuracy <= 600) {
-            setIsAccurateEnough(false);
-            setStatusBgColor('bg-red-500'); // Merah untuk akurasi lemah
-            setLocationStatus('Lokasi lemah. Tunggu sampai lebih akurat.');
-          } else {
-            setIsAccurateEnough(false);
-            setStatusBgColor('bg-red-500'); // Merah untuk sangat lemah
-            setLocationStatus(`Akurasi lokasi: ${Math.floor(accuracy)}m. Lokasi terlalu lemah.`);
-          }
+          // Mengecek jarak dengan pusat dan tambahkan akurasi untuk menentukan absensi
+          const distance = calculateDistance(latitude, longitude);
+          const totalDistance = distance + accuracy;
+          setIsAccurateEnough(totalDistance <= RADIUS);
+          console.log(totalDistance);
 
+          if (totalDistance <= RADIUS) {
+            setStatusBgColor('bg-green-500');
+            setLocationStatus('Lokasi siap untuk absen.');
+          } else {
+            setStatusBgColor('bg-red-500');
+            setLocationStatus(`Lokasi tidak memenuhi syarat untuk absen. Jarak total: ${Math.floor(totalDistance)}m.`);
+          }
         },
         (error) => {
           setLocationStatus('Gagal mendapatkan lokasi. Pastikan GPS aktif.');
@@ -70,6 +66,21 @@ const Absensi = () => {
     }
   };
 
+  const calculateDistance = (latitude, longitude) => {
+    const toRad = (value) => (value * Math.PI) / 180;
+    const R = 6371000; // Radius bumi dalam meter
+    const dLat = toRad(latitude - CENTER_COORDS.latitude);
+    const dLon = toRad(longitude - CENTER_COORDS.longitude);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(CENTER_COORDS.latitude)) *
+      Math.cos(toRad(latitude)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+    return distance;
+  };
 
   useEffect(() => {
     getLocation();
@@ -218,6 +229,4 @@ const Absensi = () => {
 };
 
 export default Absensi;
-
-
 
