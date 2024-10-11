@@ -59,7 +59,7 @@ jobs:
         ssh-keyscan -H "$SERVER" >> ~/.ssh/known_hosts
 
         # Transfer file hasil build ke server menggunakan rsync
-        rsync -avz --delete --exclude='node_modules' --exclude='.git' dist/ $USERNAME@$SERVER:~/sibiti-frontend
+        # rsync -avz --delete --exclude='node_modules' --exclude='.git' dist/ $USERNAME@$SERVER:~/sibiti-frontend
 
     - name: Restart PM2
       env:
