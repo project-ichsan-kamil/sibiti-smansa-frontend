@@ -92,7 +92,7 @@ const Sidebar = () => {
   }
 
   // Conditionally add Management Role items based on roles
-  if (hasAnyRole([Roles.ADMIN, Roles.SUPER_ADMIN])) {
+  if (hasAnyRole([Roles.SUPER_ADMIN])) {
     const managementRoleItems = [
       { key: '/cms/management-role/guru', label: <Link to="/cms/management-role/guru">Guru</Link>, hide: false },
     ];

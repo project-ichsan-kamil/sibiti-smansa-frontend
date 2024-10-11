@@ -19,7 +19,7 @@ import DashboardUser from "./user/dashboard/DashboardUser";
 import Absensi from "./user/absensi/Absensi";
 import SubmitSoal from "./admin/submit-soal/SubmitSoal";
 import RiwayatAbsensi from "./user/riwayat-absen/RiwayatAbsensi";
-import AbsensiSiswa from "./admin/absensi/AbsensiSiswa";
+import AbsensiSiswa from "./admin/absensi/AbsensiSiswaTable";
 import AbsensiGuruTable from "./admin/absensi/AbsensiGuruTable";
 
 const routes = [

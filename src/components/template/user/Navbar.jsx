@@ -123,7 +123,7 @@ const Navbar = ({ toggleSidebar }) => {
                 <ul className="space-y-2">
                   {['ADMIN', 'GURU', 'SUPER_ADMIN'].some(role => currentUser.roles.includes(role)) && (
                       <li className="flex items-center space-x-2 p-2 text-sm rounded-lg hover:bg-active hover:text-white px-6 border border-active hover:cursor-pointer"
-                      onClick={() => window.location.href = '/cms/dashboard'}>
+                      onClick={() => window.location.href = '/cms/absensi/siswa'}>
                           <FaTh />
                           <span>Dashboard</span>
                       </li>

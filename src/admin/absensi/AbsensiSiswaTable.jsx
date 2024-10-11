@@ -1,13 +1,15 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { Table, Input, Tag, Select, Button, Modal, DatePicker } from "antd";
 import { EyeOutlined, DownloadOutlined } from '@ant-design/icons';
+import UserTemplate from "../../components/template/user/UserTemplate";
 import Loading from "../../components/template/Loading";
 import Utils from "../../utils/Utils";
 import { showErrorNotification } from "../../components/template/Notification";
-import useModalDownload from "./hooks/useModalDownload";
-import CmsTemplate from '../../components/template/CmsTemplate' 
+import CmsTemplate from "../../components/template/CmsTemplate";
 import moment from 'moment';
-import api from "../../config/axios";
+import 'moment/locale/id'; // Import locale Indonesia
+
+moment.locale('id'); // Set moment to use Indonesian locale
 
 const { Search } = Input;
 const { Option } = Select;
@@ -39,49 +41,67 @@ const AbsensiGuruTable = () => {
             }
         }, 60000); // Check every minute
         return () => clearInterval(interval);
-    }, []);;
+    }, []);
 
-    // const fetchAttendanceData = async (name = "") => {
-    //     console.log("Fetching attendance data...");
-    //     showLoading();
-    //     try {
-    //         // Gantilah URL di sini dengan URL endpoint API Anda
-    //         const response = await api.get('/absents/by-date', {
-    //             params: {
-    //                 date: selectedDate,  // Mengirim parameter tanggal yang dipilih
-    //             },
-    //         });
-            
-    //         const data = response.data.data; // Sesuaikan dengan struktur response API Anda
-    //         console.log(data);
-    //         console.log("Attendance data fetched successfully", data);
-    //         setAttendanceData(data);  // Set hasil data ke state
-    //         setLastFetchedTime(new Date());
-    //     } catch (e) {
-    //         console.error("Error fetching attendance data: ", e);
-    //         showErrorNotification(e, "Gagal mengambil data absensi");
-    //     } finally {
-    //         hideLoading();
-    //     }
-    // };
-
-    const fetchAttendanceData = async (date) => {
+    const fetchAttendanceData = async (name = "") => {
         console.log("Fetching attendance data...");
         showLoading();
-    
-        // Gunakan selectedDate atau fallback ke parameter date yang dikirim
-        const dateParam = date || selectedDate;
-    
         try {
-            const response = await api.get('/absents/by-date', {
-                params: {
-                    date: dateParam,  // Mengirim parameter tanggal yang dipilih, pastikan ada nilainya
+            // Replace with your API call to fetch attendance data
+            // const response = await api.get('/attendance', { params: { name: name, date: selectedDate } });
+            // const data = response.data.data;
+            const dummyData = [
+                {
+                    id: 1,
+                    name: "John Doe",
+                    subject: "Matematika",
+                    status: "PRESENT",
+                    date: "2024-10-01",
+                    time: "08:30",
+                    notes: "Datang tepat waktu",
+                    fileUrl: "https://example.com/file1.jpg",
+                    latitude: -6.200000,
+                    longitude: 106.816666,
                 },
-            });
-            
-            const data = response.data.data; // Sesuaikan dengan struktur response API Anda
-            console.log("Attendance data fetched successfully", data);
-            setAttendanceData(data);  // Set hasil data ke state
+                {
+                    id: 2,
+                    name: "Jane Smith",
+                    subject: "Bahasa Inggris",
+                    status: "LATE",
+                    date: "2024-10-01",
+                    time: "09:00",
+                    notes: "Terlambat karena macet",
+                    fileUrl: "https://example.com/file2.jpg",
+                    latitude: -6.210000,
+                    longitude: 106.826666,
+                },
+                {
+                    id: 3,
+                    name: "Alice Johnson",
+                    subject: "Fisika",
+                    status: "EXCUSED",
+                    date: "2024-10-01",
+                    time: "08:45",
+                    notes: "Izin ke dokter",
+                    fileUrl: "https://example.com/file3.jpg",
+                    latitude: -6.220000,
+                    longitude: 106.836666,
+                },
+                {
+                    id: 4,
+                    name: "Bob Brown",
+                    subject: "Kimia",
+                    status: "PRESENT",
+                    date: "2024-10-02",
+                    time: "08:20",
+                    notes: "Datang lebih awal",
+                    fileUrl: "https://example.com/file4.jpg",
+                    latitude: -6.230000,
+                    longitude: 106.846666,
+                },
+            ];
+            console.log("Attendance data fetched successfully");
+            setAttendanceData(dummyData);
             setLastFetchedTime(new Date());
         } catch (e) {
             console.error("Error fetching attendance data: ", e);
@@ -107,14 +127,11 @@ const AbsensiGuruTable = () => {
         }
     };
 
+    // Function to handle date change
     const handleDateChange = (date, dateString) => {
         console.log("Date changed: ", dateString);
-    
-        // Jika dateString kosong (misalnya ketika dihapus), set default ke hari ini
-        const selectedDateValue = dateString ? dateString : moment().format('YYYY-MM-DD');
-        
-        setSelectedDate(selectedDateValue);
-        fetchAttendanceData(selectedDateValue);  // Panggil fetch dengan tanggal yang telah disesuaikan
+        setSelectedDate(dateString);
+        fetchAttendanceData();
     };
 
     // Function to handle download modal
@@ -135,8 +152,7 @@ const AbsensiGuruTable = () => {
         },
         {
             title: "Nama",
-            dataIndex: "fullName", 
-            key: "fullName",      
+            dataIndex: "name",
             width: "15%",
         },
         {
@@ -178,10 +194,8 @@ const AbsensiGuruTable = () => {
         },
         {
             title: "Waktu",
-            dataIndex: "date",
-            key: "time",
+            dataIndex: "time",
             width: "10%",
-            render: (date) => moment(date).format('HH:mm'), // Format untuk hanya menampilkan jam
         },
         {
             title: "Aksi",
@@ -204,7 +218,7 @@ const AbsensiGuruTable = () => {
                                         <tbody>
                                             <tr>
                                                 <td className="font-normal">Nama</td>
-                                                <td className="font-normal">: {record.fullName}</td>
+                                                <td className="font-normal">: {record.name}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-normal">Mata Pelajaran</td>
@@ -216,7 +230,7 @@ const AbsensiGuruTable = () => {
                                             </tr>
                                             <tr>
                                                 <td className="font-normal">Waktu</td>
-                                                <td className="font-normal">: {moment(record.date).format('HH:mm')}</td>
+                                                <td className="font-normal">: {record.time}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -228,15 +242,11 @@ const AbsensiGuruTable = () => {
                                             </tr>
                                             <tr>
                                                 <td className="font-normal">Catatan</td>
-                                                <td className="font-normal">: {record.notes ? record.notes : "-"}</td>
+                                                <td className="font-normal">: {record.notes}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-normal">File</td>
-                                                <td className="font-normal">
-                                                : {record.fileUrl ? (
-                                                    <a href={record.fileUrl} target="_blank" rel="noopener noreferrer">Lihat File</a>
-                                                    ) : "-"} {/* Menampilkan '-' jika fileUrl tidak ada */}
-                                                </td>
+                                                <td className="font-normal">: <a href={record.fileUrl} target="_blank" rel="noopener noreferrer">Lihat File</a></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -343,16 +353,51 @@ const AbsensiGuruTable = () => {
                 {modalContent}
             </Modal>
 
+            <Modal
+                title="Download Report Absensi"
+                visible={isDownloadModalVisible}
+                onCancel={() => {
+                    setIsDownloadModalVisible(false);
+                }}
+                footer={null}
+            >
+                <div className="flex flex-col gap-4">
+                    <Select
+                        defaultValue={selectedYear}
+                        style={{ width: '100%' }}
+                        onChange={(value) => {
+                            console.log("Selected year: ", value);
+                            setSelectedYear(value);
+                        }}
+                    >
+                        {Array.from({ length: 5 }, (_, i) => moment().year() - i).map((year) => (
+                            <Option key={year} value={year}>{year}</Option>
+                        ))}
+                    </Select>
+                    <Select
+                        defaultValue={selectedMonth}
+                        style={{ width: '100%' }}
+                        onChange={(value) => {
+                            console.log("Selected month: ", value);
+                            setSelectedMonth(value);
+                        }}
+                    >
+                        {moment.months().map((month, index) => (
+                            <Option key={index + 1} value={index + 1}>{month}</Option>
+                        ))}
+                    </Select>
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            console.log(`Generating report for year: ${selectedYear}, month: ${selectedMonth}`);
+                            // Call API to generate report
+                        }}
+                    >
+                        Download Excel
+                    </Button>
+                </div>
+            </Modal>
 
-            {useModalDownload({
-                isDownloadModalVisible,
-                setIsDownloadModalVisible,
-                selectedYear,
-                setSelectedYear,
-                selectedMonth,
-                setSelectedMonth,
-            })}
-           
             {loading && <Loading />}
         </Fragment>
     );
