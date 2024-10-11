@@ -37,13 +37,15 @@ jobs:
 
     - name: Deploy to Server
       run: |
-        # Tentukan server dan SSH key berdasarkan branch pull request
+        # Tentukan server, SSH key, dan username berdasarkan branch pull request
         if [ "${{ github.base_ref }}" == "production" ]; then
           SERVER="${{ secrets.PROD_SERVER }}" # Ambil IP server production dari GitHub Secrets
           SSH_KEY="${{ secrets.SSH_PRIVATE_KEY_PROD }}" # Ambil SSH key server production dari GitHub Secrets
+          USERNAME="${{ secrets.PROD_USERNAME }}" # Ambil username server production dari GitHub Secrets
         elif [ "${{ github.base_ref }}" == "prodlike" ]; then
           SERVER="${{ secrets.PRODLIKE_SERVER }}" # Ambil IP server prodlike dari GitHub Secrets
           SSH_KEY="${{ secrets.SSH_PRIVATE_KEY_PRODLIKE }}" # Ambil SSH key server prodlike dari GitHub Secrets
+          USERNAME="${{ secrets.PRODLIKE_USERNAME }}" # Ambil username server prodlike dari GitHub Secrets
         else
           echo "Branch tidak dikenali, proses deploy dibatalkan."
           exit 1
@@ -59,15 +61,17 @@ jobs:
 
     - name: Restart PM2
       run: |
-        # Tentukan server dan SSH key berdasarkan branch pull request
+        # Tentukan server, SSH key, dan username berdasarkan branch pull request
         if [ "${{ github.base_ref }}" == "production" ]; then
           SERVER="${{ secrets.PROD_SERVER }}" # Ambil IP server production dari GitHub Secrets
           SSH_KEY="${{ secrets.SSH_PRIVATE_KEY_PROD }}" # Ambil SSH key server production dari GitHub Secrets
           PM2_NAME="sibiti-prod"
+          USERNAME="${{ secrets.PROD_USERNAME }}" # Ambil username server production dari GitHub Secrets
         elif [ "${{ github.base_ref }}" == "prodlike" ]; then
           SERVER="${{ secrets.PRODLIKE_SERVER }}" # Ambil IP server prodlike dari GitHub Secrets
           SSH_KEY="${{ secrets.SSH_PRIVATE_KEY_PRODLIKE }}" # Ambil SSH key server prodlike dari GitHub Secrets
           PM2_NAME="sibiti-prodlike"
+          USERNAME="${{ secrets.PRODLIKE_USERNAME }}" # Ambil username server prodlike dari GitHub Secrets
         else
           echo "Branch tidak dikenali, proses restart PM2 dibatalkan."
           exit 1
@@ -78,7 +82,7 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H "$SERVER" >> ~/.ssh/known_hosts
 
-        ssh $USERNAME@$SERVER '
+        ssh -i ~/.ssh/id_rsa $USERNAME@$SERVER '
           cd ~/sibiti-frontend;
           if command -v pm2 >/dev/null 2>&1; then
             if pm2 list | grep -q "$PM2_NAME"; then
