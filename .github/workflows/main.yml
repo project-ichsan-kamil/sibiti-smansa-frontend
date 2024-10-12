@@ -1,6 +1,10 @@
 name: CI/CD Vite Project
 
 on:
+  push:
+    branches:
+      - production
+      - prodlike
   pull_request:
     branches:
       - production
