@@ -81,7 +81,7 @@ const LoginUser = () => {
             style={{ backgroundImage: `url(${image.welcome})` }}
           >
             <div className="absolute inset-x-0 bottom-28 text-center">
-              <h1 className="text-2xl lg:text-3xl font-light">Selamat Datang di</h1>
+              <h1 className="text-2xl lg:text-3xl font-light">Selamat Datang di Test Change Prodlike</h1>
               <h1 className="text-2xl lg:text-3xl font-bold">CBT SMAN 1 PAYAKUMBUH</h1>
             </div>
           </div>
