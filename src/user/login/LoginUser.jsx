@@ -81,7 +81,7 @@ const LoginUser = () => {
             style={{ backgroundImage: `url(${image.welcome})` }}
           >
             <div className="absolute inset-x-0 bottom-28 text-center">
-              <h1 className="text-2xl lg:text-3xl font-light">Selamat Datang di Test Change Prodlike</h1>
+              <h1 className="text-2xl lg:text-3xl font-light">Selamat Datang di</h1>
               <h1 className="text-2xl lg:text-3xl font-bold">CBT SMAN 1 PAYAKUMBUH</h1>
             </div>
           </div>
@@ -108,7 +108,7 @@ const LoginUser = () => {
                   <img src={image.smansa} alt="School Logo" />
                 </div>
                 <div className='lg:py-10 py-5 '>
-                  <h2 className="text-3xl font-semibold mb-5">Login</h2>
+                  <h2 className="text-3xl font-semibold mb-5">Login test change</h2>
                   <h2 className="text-xl font-normal">Hai, Selamat Datang</h2>
                 </div>
                 <form className="space-y-4" onSubmit={submitForm}>
