@@ -89,11 +89,11 @@ jobs:
             if pm2 list | grep -q "$PM2_NAME"; then
               pm2 restart "$PM2_NAME";
             else
-              pm2 start npm --name "$PM2_NAME" -- run start;
+              pm2 start npm --name "$PM2_NAME" -- run preview;
             fi
           else
             npm install -g pm2;
-            pm2 start npm --name "$PM2_NAME" -- run start;
+            pm2 start npm --name "$PM2_NAME" -- run preview;
           fi
           pm2 save; # Simpan konfigurasi PM2 untuk memastikan proses otomatis di-restart setelah server reboot
         '
