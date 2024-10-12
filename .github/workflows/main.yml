@@ -60,6 +60,43 @@ jobs:
         # rsync -avz --delete --exclude='node_modules' --exclude='.git' dist/ $USERNAME@$SERVER:~/sibiti-frontend
            rsync -avz --delete --exclude='node_modules' --exclude='.git' dist/ package.json package-lock.json $USERNAME@$SERVER:~/sibiti-frontend
 
+    # - name: Restart PM2
+    #   run: |
+    #     # Tentukan server, SSH key, dan username berdasarkan branch pull request
+    #     if [ "${{ github.base_ref }}" == "production" ]; then
+    #       SERVER="${{ secrets.PROD_SERVER }}" # Ambil IP server production dari GitHub Secrets
+    #       SSH_KEY="${{ secrets.SSH_PRIVATE_KEY_PROD }}" # Ambil SSH key server production dari GitHub Secrets
+    #       PM2_NAME="smansa-prod"
+    #       USERNAME="${{ secrets.PROD_USERNAME }}" # Ambil username server production dari GitHub Secrets
+    #     elif [ "${{ github.base_ref }}" == "prodlike" ]; then
+    #       SERVER="${{ secrets.PRODLIKE_SERVER }}" # Ambil IP server prodlike dari GitHub Secrets
+    #       SSH_KEY="${{ secrets.SSH_PRIVATE_KEY_PRODLIKE }}" # Ambil SSH key server prodlike dari GitHub Secrets
+    #       PM2_NAME="smansa-prodlike"
+    #       USERNAME="${{ secrets.PRODLIKE_USERNAME }}" # Ambil username server prodlike dari GitHub Secrets
+    #     else
+    #       echo "Branch tidak dikenali, proses restart PM2 dibatalkan."
+    #       exit 1
+    #     fi
+
+    #     mkdir -p ~/.ssh
+    #     echo "$SSH_KEY" > ~/.ssh/id_rsa
+    #     chmod 600 ~/.ssh/id_rsa
+    #     ssh-keyscan -H "$SERVER" >> ~/.ssh/known_hosts
+
+    #     ssh -i ~/.ssh/id_rsa $USERNAME@$SERVER '
+    #       cd ~/sibiti-frontend;
+    #       if command -v pm2 >/dev/null 2>&1; then
+    #         if pm2 list | grep -q "$PM2_NAME"; then
+    #           pm2 restart "$PM2_NAME";
+    #         else
+    #           pm2 start npm --name "$PM2_NAME" -- run preview;
+    #         fi
+    #       else
+    #         npm install -g pm2;
+    #         pm2 start npm --name "$PM2_NAME" -- run preview;
+    #       fi
+    #       pm2 save; # Simpan konfigurasi PM2 untuk memastikan proses otomatis di-restart setelah server reboot
+    #     '
     - name: Restart PM2
       run: |
         # Tentukan server, SSH key, dan username berdasarkan branch pull request
@@ -77,23 +114,37 @@ jobs:
           echo "Branch tidak dikenali, proses restart PM2 dibatalkan."
           exit 1
         fi
-
+    
+        echo "Restarting PM2 for $PM2_NAME on $SERVER with user $USERNAME"
+  
+        # Setup SSH
         mkdir -p ~/.ssh
         echo "$SSH_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H "$SERVER" >> ~/.ssh/known_hosts
-
+    
+        # Jalankan perintah di server melalui SSH
         ssh -i ~/.ssh/id_rsa $USERNAME@$SERVER '
           cd ~/sibiti-frontend;
+          
+          # Periksa apakah PM2 terinstall
           if command -v pm2 >/dev/null 2>&1; then
+            echo "PM2 terdeteksi, memeriksa proses $PM2_NAME"
+            # Periksa apakah proses sudah berjalan
             if pm2 list | grep -q "$PM2_NAME"; then
+              echo "Proses $PM2_NAME ditemukan, restart"
               pm2 restart "$PM2_NAME";
             else
+              echo "Proses $PM2_NAME tidak ditemukan, memulai proses"
               pm2 start npm --name "$PM2_NAME" -- run preview;
             fi
           else
+            echo "PM2 tidak terinstall, menginstal PM2"
             npm install -g pm2;
             pm2 start npm --name "$PM2_NAME" -- run preview;
           fi
-          pm2 save; # Simpan konfigurasi PM2 untuk memastikan proses otomatis di-restart setelah server reboot
+          
+          # Simpan konfigurasi agar proses otomatis di-restart setelah server reboot
+          pm2 save;
         '
+        
