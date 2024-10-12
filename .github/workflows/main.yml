@@ -66,12 +66,12 @@ jobs:
         if [ "${{ github.base_ref }}" == "production" ]; then
           SERVER="${{ secrets.PROD_SERVER }}" # Ambil IP server production dari GitHub Secrets
           SSH_KEY="${{ secrets.SSH_PRIVATE_KEY_PROD }}" # Ambil SSH key server production dari GitHub Secrets
-          PM2_NAME="sibiti-prod"
+          PM2_NAME="smansa-prod"
           USERNAME="${{ secrets.PROD_USERNAME }}" # Ambil username server production dari GitHub Secrets
         elif [ "${{ github.base_ref }}" == "prodlike" ]; then
           SERVER="${{ secrets.PRODLIKE_SERVER }}" # Ambil IP server prodlike dari GitHub Secrets
           SSH_KEY="${{ secrets.SSH_PRIVATE_KEY_PRODLIKE }}" # Ambil SSH key server prodlike dari GitHub Secrets
-          PM2_NAME="sibiti-prodlike"
+          PM2_NAME="smansa-prodlike"
           USERNAME="${{ secrets.PRODLIKE_USERNAME }}" # Ambil username server prodlike dari GitHub Secrets
         else
           echo "Branch tidak dikenali, proses restart PM2 dibatalkan."
