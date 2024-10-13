@@ -3,7 +3,7 @@
 // Base URL API untuk berbagai environment
 const BASE_URL = {
     development: "http://localhost:3001/api",
-    staging: "https://sibiti-smansa-prodlike.my.id",
+    staging: "https://sibiti-smansa-prodlike.my.id/api",
     production: "https://sibiti-smansa.my.id",
   };
   
