@@ -108,7 +108,7 @@ const LoginUser = () => {
                   <img src={image.smansa} alt="School Logo" />
                 </div>
                 <div className='lg:py-10 py-5 '>
-                  <h2 className="text-3xl font-semibold mb-5">Login</h2>
+                  <h2 className="text-3xl font-semibold mb-5">Login Change from prodlike</h2>
                   <h2 className="text-xl font-normal">Hai, Selamat Datang</h2>
                 </div>
                 <form className="space-y-4" onSubmit={submitForm}>
@@ -173,9 +173,8 @@ const LoginUser = () => {
   );
 };
 
-// change
-// change
 
+//rolback
 export default LoginUser;
 
 
