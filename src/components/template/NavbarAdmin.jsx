@@ -47,6 +47,8 @@ const NavbarAdmin = () => {
             }
         } else if (key === "profile") {
             navigate("/profile");
+        } else if(key === "user-page"){
+            navigate("/absensi")
         } else if (key === "logout") {
             handleLogout();
         }
@@ -57,6 +59,7 @@ const NavbarAdmin = () => {
             {/* TODO un hide */}
             {/* <Menu.Item key="dashboard">Dashboard</Menu.Item>
             <Menu.Item key="profile">Profile</Menu.Item> */}
+            <Menu.Item key="user-page">User Page</Menu.Item>
             <Menu.Item key="logout">Logout</Menu.Item>
         </Menu>
     );
