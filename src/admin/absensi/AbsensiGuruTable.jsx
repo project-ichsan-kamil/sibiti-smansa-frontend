@@ -41,30 +41,6 @@ const AbsensiGuruTable = () => {
         return () => clearInterval(interval);
     }, []);;
 
-    // const fetchAttendanceData = async (name = "") => {
-    //     console.log("Fetching attendance data...");
-    //     showLoading();
-    //     try {
-    //         // Gantilah URL di sini dengan URL endpoint API Anda
-    //         const response = await api.get('/absents/by-date', {
-    //             params: {
-    //                 date: selectedDate,  // Mengirim parameter tanggal yang dipilih
-    //             },
-    //         });
-            
-    //         const data = response.data.data; // Sesuaikan dengan struktur response API Anda
-    //         console.log(data);
-    //         console.log("Attendance data fetched successfully", data);
-    //         setAttendanceData(data);  // Set hasil data ke state
-    //         setLastFetchedTime(new Date());
-    //     } catch (e) {
-    //         console.error("Error fetching attendance data: ", e);
-    //         showErrorNotification(e, "Gagal mengambil data absensi");
-    //     } finally {
-    //         hideLoading();
-    //     }
-    // };
-
     const fetchAttendanceData = async (date) => {
         console.log("Fetching attendance data...");
         showLoading();
