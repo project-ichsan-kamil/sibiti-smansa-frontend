@@ -5,7 +5,7 @@ import Loading from "../../components/template/Loading";
 import Utils from "../../utils/Utils";
 import { showErrorNotification } from "../../components/template/Notification";
 import useModalDownload from "./hooks/useModalDownload";
-import CmsTemplate from '../../components/template/CmsTemplate' 
+import CmsTemplate from '../../components/template/CmsTemplate';
 import moment from 'moment';
 import api from "../../config/axios";
 
@@ -24,6 +24,7 @@ const AbsensiGuruTable = () => {
     const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
     const [selectedYear, setSelectedYear] = useState(moment().year());
     const [selectedMonth, setSelectedMonth] = useState(moment().month() + 1);
+    const [searchText, setSearchText] = useState("");
 
     useEffect(() => {
         console.log("Initial fetch of attendance data");
@@ -39,22 +40,22 @@ const AbsensiGuruTable = () => {
             }
         }, 60000); // Check every minute
         return () => clearInterval(interval);
-    }, []);;
+    }, []);
 
     const fetchAttendanceData = async (date) => {
         console.log("Fetching attendance data...");
         showLoading();
-    
+
         // Gunakan selectedDate atau fallback ke parameter date yang dikirim
         const dateParam = date || selectedDate;
-    
+
         try {
             const response = await api.get('/absents/by-date', {
                 params: {
                     date: dateParam,  // Mengirim parameter tanggal yang dipilih, pastikan ada nilainya
                 },
             });
-            
+
             const data = response.data.data; // Sesuaikan dengan struktur response API Anda
             console.log("Attendance data fetched successfully", data);
             setAttendanceData(data);  // Set hasil data ke state
@@ -67,25 +68,9 @@ const AbsensiGuruTable = () => {
         }
     };
 
-    // Function to handle search input changes
-    const searchAttendance = (value) => {
-        console.log(`Searching attendance with value: ${value}`);
-        if (value) {
-            // Filter attendance data based on the input value
-            const filteredData = attendanceData.filter((item) =>
-                item.name.toLowerCase().includes(value.toLowerCase())
-            );
-            console.log("Filtered attendance data: ", filteredData);
-            setAttendanceData(filteredData);
-        } else {
-            // If input is cleared, refetch the original data
-            fetchAttendanceData();
-        }
-    };
-
     const handleDateChange = (date, dateString) => {
         console.log("Date changed: ", dateString);
-    
+
         // Jika dateString kosong (misalnya ketika dihapus), set default ke hari ini
         const selectedDateValue = dateString ? dateString : moment().format('YYYY-MM-DD');
         
@@ -98,6 +83,14 @@ const AbsensiGuruTable = () => {
         console.log("Download report button clicked");
         setIsDownloadModalVisible(true);
     };
+
+    const handleSearchChange = (e) => {
+        setSearchText(e.target.value);
+    };
+
+    const filteredData = attendanceData.filter((item) =>
+        item.fullName && item.fullName.toLowerCase().includes(searchText.toLowerCase())
+    );
 
     // Define the table columns
     const columns = [
@@ -265,19 +258,17 @@ const AbsensiGuruTable = () => {
                         </div>
                         <div className="flex gap-2">
                             <Button
-                                    type="primary"
-                                    icon={<DownloadOutlined />}
-                                    onClick={handleDownloadReport}
-                                >
-                                    Download
-                                </Button>
+                                className="hidden"
+                                type="primary"
+                                icon={<DownloadOutlined />}
+                                onClick={handleDownloadReport}
+                            >
+                                Download
+                            </Button>
                             <Search
                                 placeholder="Cari Absensi Guru"
                                 allowClear
-                                onChange={(e) => {
-                                    // Search attendance as user types
-                                    searchAttendance(e.target.value);
-                                }}
+                                onChange={handleSearchChange}
                                 style={{ width: 200 }}
                             />
                         </div>
@@ -290,7 +281,7 @@ const AbsensiGuruTable = () => {
 
                     <Table
                         columns={columns}
-                        dataSource={attendanceData}
+                        dataSource={filteredData}
                         pagination={{
                             current: currentPage,
                             pageSize: pageSize,
