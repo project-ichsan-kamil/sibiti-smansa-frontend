@@ -8,7 +8,8 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState({
     fullName: "",
     roles: "",
-  }); // Initial state for currentUser
+    fotoProfile: ""
+  });
 
   return (
     <AuthContext.Provider value={{ currentUser, setCurrentUser }}>

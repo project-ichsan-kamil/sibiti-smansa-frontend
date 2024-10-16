@@ -43,6 +43,22 @@ const Navbar = ({ toggleSidebar }) => {
       });
   };
 
+  const hasProfileImage = currentUser.fotoProfile && currentUser.fotoProfile.trim() !== '';
+    const profileImage = hasProfileImage ? currentUser.fotoProfile : '';
+
+    // Ambil inisial dari nama lengkap
+    const getInitials = (name) => {
+        const names = name.split(' ');
+        // Jika hanya satu kata, ambil huruf pertamanya
+        if (names.length === 1) {
+            return names[0].charAt(0).toUpperCase();
+        }
+        // Jika lebih dari satu kata, ambil huruf pertama dari nama depan dan belakang
+        return names.map(n => n.charAt(0).toUpperCase()).join('');
+    };
+
+    const initials = getInitials(currentUser.fullName);
+
   return (
     <div className="flex items-center justify-between p-3 lg:px-20 bg-default shadow-sm">
       {/* Toggle Sidebar hanya muncul di mobile view */}
@@ -105,17 +121,25 @@ const Navbar = ({ toggleSidebar }) => {
 
         {/* Profile Dropdown */}
         <div className="relative">
-          <div className="flex items-center cursor-pointer" onClick={toggleProfile}>
-            <img
-              src={image.smansa}    //TOOD change profile
-              alt="User Avatar"
-              className="w-10 h-10 rounded-full"
-            />
-            <span className="ml-2 text-sm">{currentUser.fullName}</span> 
-            <FaChevronDown
-                    className={`ml-1 text-xs transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} 
+            <div className="flex items-center cursor-pointer" onClick={toggleProfile}>
+            {hasProfileImage ? (
+                <img
+                    src={profileImage}
+                    alt="User Avatar"
+                    className="w-10 h-10 rounded-full"
                 />
-          </div>
+            ) : (
+                <div
+                    className="w-10 h-10 rounded-full flex items-center bg-active justify-center"
+                >
+                    <span className="text-white font-bold">{initials}</span> {/* Tampilkan inisial */}
+                </div>
+            )}
+            <span className="ml-2 text-sm">{currentUser.fullName}</span>
+            <FaChevronDown
+                className={`ml-1 text-xs transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} 
+            />
+        </div>
           
           {/* Dropdown Menu */}
           {isProfileOpen && (

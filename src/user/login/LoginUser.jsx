@@ -108,7 +108,7 @@ const LoginUser = () => {
                   <img src={image.smansa} alt="School Logo" />
                 </div>
                 <div className='lg:py-10 py-5 '>
-                  <h2 className="text-3xl font-semibold mb-5">Login coba rolback</h2>
+                  <h2 className="text-3xl font-semibold mb-5">Login</h2>
                   <h2 className="text-xl font-normal">Hai, Selamat Datang</h2>
                 </div>
                 <form className="space-y-4" onSubmit={submitForm}>
@@ -125,7 +125,7 @@ const LoginUser = () => {
                       onChange={handleInputChange('email')}
                       className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-offset-0 sm:text-sm"
                     />
-                    {error.email && <p className="text-red-500 text-xs">{error.email}</p>}
+                    {error.email && <p className="text-red-500 text-xs mt-1">{error.email}</p>}
                   </div>
                   <div>
                     <label htmlFor="password" className="block text-sm font-medium text-gray-700">
@@ -147,7 +147,7 @@ const LoginUser = () => {
                         </button>
                       </div>
                     </div>
-                    {error.password && <p className="text-red-500 text-xs">{error.password}</p>}
+                    {error.password && <p className="text-red-500 text-xs mt-1">{error.password}</p>}
                   </div>
                   <div className="flex items-center justify-end">
                     <a href="/forgot-password" className="text-sm text-active hover:text-hover">

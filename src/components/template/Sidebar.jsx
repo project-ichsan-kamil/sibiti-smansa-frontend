@@ -109,15 +109,6 @@ const Sidebar = () => {
     });
   }
 
-  // Conditionally add Create User item for SUPER_ADMIN
-  if (hasRole(Roles.SUPER_ADMIN)) {
-    baseItems.push({
-      key: '/cms/create-user',
-      icon: <LinkOutlined />,
-      label: <Link to="/cms/create-user">Create User</Link>,
-      hide: false,
-    });
-  }
 
   // Add Absensi menu with submenus for Guru and Siswa
   const absensiItems = {
@@ -142,6 +133,16 @@ const Sidebar = () => {
   if (absensiItems.children.some(item => !item.hide)) {
     baseItems.push(absensiItems);
   }
+
+    // Conditionally add Create User item for SUPER_ADMIN
+    if (hasRole(Roles.SUPER_ADMIN)) {
+      baseItems.push({
+        key: '/cms/create-user',
+        icon: <LinkOutlined />,
+        label: <Link to="/cms/create-user">Create User</Link>,
+        hide: false,
+      });
+    }
 
   // Filter out items that should be hidden
   const visibleItems = baseItems.filter(item => !item.hide);

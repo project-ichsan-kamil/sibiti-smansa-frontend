@@ -18,7 +18,7 @@ const PrivateRoute = ({ children, allowedRoles }) => {
         console.log(response);
         setIsAuthenticated(true);
         setUserRoles(response.data.roles || []);
-        setCurrentUser({ ...currentUser, fullName: response.data.fullName, roles: response.data.roles });
+        setCurrentUser({ ...currentUser, fullName: response.data.fullName, roles: response.data.roles, fotoProfile: response.data.fotoProfile });
       })
       .catch((err) => {
         console.log("error auth");
@@ -41,10 +41,6 @@ const PrivateRoute = ({ children, allowedRoles }) => {
   }
 
   if (allowedRoles && !allowedRoles.some((role) => userRoles.includes(role))) {
-    console.log("allowedRoles");
-    console.log(allowedRoles);
-    console.log("user roles");
-    console.log(userRoles);
     return <Navigate to="/not-authorized" replace />;
   }
 

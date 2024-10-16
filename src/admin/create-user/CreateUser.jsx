@@ -336,7 +336,13 @@ const CreateUser = () => {
                             borderColor: "#4CAF50",
                             color: "white",
                         }}
-                        onClick={() => handleApprove(record.id)}
+                        onClick={() =>
+                            ConfirmModal({
+                                title: "Apakah Anda yakin ingin memverifikasi data ini?",
+                                onOk: () => handleApprove(record.id),
+                                content: "Klik OK untuk melanjutkan verifikasi.",
+                            }).showConfirm()
+                        }
                         icon={<CheckOutlined />}
                         type="primary"
                     />
@@ -493,7 +499,7 @@ const CreateUser = () => {
                             >
                                 <Input />
                             </Form.Item>
-                            <Form.Item name="class" label="Class">
+                            <Form.Item name="classId" label="Class">
                                 <Select placeholder="Select Class">
                                     {classOptions.map((classItem) => (
                                         <Option

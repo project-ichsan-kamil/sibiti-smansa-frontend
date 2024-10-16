@@ -1,20 +1,18 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { Table, Input, Tag, Select, Button, Modal, DatePicker } from "antd";
 import { EyeOutlined, DownloadOutlined } from '@ant-design/icons';
-import UserTemplate from "../../components/template/user/UserTemplate";
 import Loading from "../../components/template/Loading";
 import Utils from "../../utils/Utils";
 import { showErrorNotification } from "../../components/template/Notification";
-import CmsTemplate from "../../components/template/CmsTemplate";
+import useModalDownload from "./hooks/useModalDownload";
+import CmsTemplate from '../../components/template/CmsTemplate' 
 import moment from 'moment';
-import 'moment/locale/id'; // Import locale Indonesia
-
-moment.locale('id'); // Set moment to use Indonesian locale
+import api from "../../config/axios";
 
 const { Search } = Input;
 const { Option } = Select;
 
-const AbsensiGuruTable = () => {
+const AbsensiSiswaTable = () => {
     const [attendanceData, setAttendanceData] = useState([]);
     const { showLoading, hideLoading, loading } = Utils();
     const [currentPage, setCurrentPage] = useState(1);
@@ -27,10 +25,15 @@ const AbsensiGuruTable = () => {
     const [selectedYear, setSelectedYear] = useState(moment().year());
     const [selectedMonth, setSelectedMonth] = useState(moment().month() + 1);
 
+    const [classOptions, setClassOptions] = useState([]); 
+    const [selectedClassId, setSelectedClassId] = useState(null);
+
     useEffect(() => {
-        console.log("Initial fetch of attendance data");
         // Initial fetch of attendance data
-        fetchAttendanceData();
+        fetchClasses();
+        // fetchAttendanceData();
+        fetchAttendanceData(selectedDate, selectedClassId);
+
         // Set interval to refetch data every 5 minutes
         const interval = setInterval(() => {
             const currentMinute = moment().minute();
@@ -41,67 +44,31 @@ const AbsensiGuruTable = () => {
             }
         }, 60000); // Check every minute
         return () => clearInterval(interval);
-    }, []);
+    }, []);;
 
-    const fetchAttendanceData = async (name = "") => {
+    const fetchAttendanceData = async (date, classId) => {
         console.log("Fetching attendance data...");
         showLoading();
+
+        // Construct API parameters object
+        const params = {};
+
+        if (date) {
+            params.date = date;
+        } else {
+            params.date = selectedDate; // fallback to the default state value if no date is provided
+        }
+
+        // Add classId only if it's selected (not null or undefined)
+        if (classId) {
+            params.classId = classId;
+        }
+
         try {
-            // Replace with your API call to fetch attendance data
-            // const response = await api.get('/attendance', { params: { name: name, date: selectedDate } });
-            // const data = response.data.data;
-            const dummyData = [
-                {
-                    id: 1,
-                    name: "John Doe",
-                    subject: "Matematika",
-                    status: "PRESENT",
-                    date: "2024-10-01",
-                    time: "08:30",
-                    notes: "Datang tepat waktu",
-                    fileUrl: "https://example.com/file1.jpg",
-                    latitude: -6.200000,
-                    longitude: 106.816666,
-                },
-                {
-                    id: 2,
-                    name: "Jane Smith",
-                    subject: "Bahasa Inggris",
-                    status: "LATE",
-                    date: "2024-10-01",
-                    time: "09:00",
-                    notes: "Terlambat karena macet",
-                    fileUrl: "https://example.com/file2.jpg",
-                    latitude: -6.210000,
-                    longitude: 106.826666,
-                },
-                {
-                    id: 3,
-                    name: "Alice Johnson",
-                    subject: "Fisika",
-                    status: "EXCUSED",
-                    date: "2024-10-01",
-                    time: "08:45",
-                    notes: "Izin ke dokter",
-                    fileUrl: "https://example.com/file3.jpg",
-                    latitude: -6.220000,
-                    longitude: 106.836666,
-                },
-                {
-                    id: 4,
-                    name: "Bob Brown",
-                    subject: "Kimia",
-                    status: "PRESENT",
-                    date: "2024-10-02",
-                    time: "08:20",
-                    notes: "Datang lebih awal",
-                    fileUrl: "https://example.com/file4.jpg",
-                    latitude: -6.230000,
-                    longitude: 106.846666,
-                },
-            ];
-            console.log("Attendance data fetched successfully");
-            setAttendanceData(dummyData);
+            const response = await api.get('/absents/students', { params });
+            const data = response.data.data; // Adjust according to your response structure
+            console.log("Attendance data fetched successfully", data);
+            setAttendanceData(data);
             setLastFetchedTime(new Date());
         } catch (e) {
             console.error("Error fetching attendance data: ", e);
@@ -111,33 +78,57 @@ const AbsensiGuruTable = () => {
         }
     };
 
-    // Function to handle search input changes
+    const fetchClasses = async () => {
+        console.log("Fetching class options...");
+        try {
+            const response = await api.get('/classes'); // Adjust the endpoint as per your API
+            const classes = response.data.data; // Adjust to your response structure
+            setClassOptions(classes);
+            console.log("Class options fetched successfully", classes);
+        } catch (e) {
+            console.error("Error fetching class options: ", e);
+            showErrorNotification(e, "Gagal mengambil data kelas");
+        }
+    };
+    
     const searchAttendance = (value) => {
         console.log(`Searching attendance with value: ${value}`);
         if (value) {
             // Filter attendance data based on the input value
             const filteredData = attendanceData.filter((item) =>
-                item.name.toLowerCase().includes(value.toLowerCase())
+                item.fullName && item.fullName.toLowerCase().includes(value.toLowerCase())
             );
             console.log("Filtered attendance data: ", filteredData);
             setAttendanceData(filteredData);
         } else {
             // If input is cleared, refetch the original data
-            fetchAttendanceData();
+            fetchAttendanceData(selectedDate, selectedClassId);
         }
     };
 
-    // Function to handle date change
     const handleDateChange = (date, dateString) => {
         console.log("Date changed: ", dateString);
-        setSelectedDate(dateString);
-        fetchAttendanceData();
+    
+        // Jika dateString kosong (misalnya ketika dihapus), set default ke hari ini
+        const selectedDateValue = dateString ? dateString : moment().format('YYYY-MM-DD');
+        
+        setSelectedDate(selectedDateValue);
+        fetchAttendanceData(selectedDateValue);  // Panggil fetch dengan tanggal yang telah disesuaikan
     };
+    
 
     // Function to handle download modal
     const handleDownloadReport = () => {
         console.log("Download report button clicked");
         setIsDownloadModalVisible(true);
+    };
+
+    const handleClassChange = (value) => {
+        console.log("Class changed: ", value);
+        setSelectedClassId(value);
+
+        // Fetch attendance data immediately with the new classId
+        fetchAttendanceData(selectedDate, value);
     };
 
     // Define the table columns
@@ -152,13 +143,14 @@ const AbsensiGuruTable = () => {
         },
         {
             title: "Nama",
-            dataIndex: "name",
-            width: "15%",
+            dataIndex: "fullName", 
+            key: "fullName",      
+            width: "20%",
         },
         {
-            title: "Mata Pelajaran",
-            dataIndex: "subject",
-            width: "15%",
+            title: "Kelas",
+            dataIndex: "className",
+            width: "10%",
         },
         {
             title: "Status",
@@ -194,8 +186,10 @@ const AbsensiGuruTable = () => {
         },
         {
             title: "Waktu",
-            dataIndex: "time",
+            dataIndex: "date",
+            key: "time",
             width: "10%",
+            render: (date) => moment(date).format('HH:mm'), // Format untuk hanya menampilkan jam
         },
         {
             title: "Aksi",
@@ -218,11 +212,11 @@ const AbsensiGuruTable = () => {
                                         <tbody>
                                             <tr>
                                                 <td className="font-normal">Nama</td>
-                                                <td className="font-normal">: {record.name}</td>
+                                                <td className="font-normal">: {record.fullName}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-normal">Mata Pelajaran</td>
-                                                <td className="font-normal">: {record.subject}</td>
+                                                <td className="font-normal">: {record.className}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-normal">Tanggal</td>
@@ -230,7 +224,7 @@ const AbsensiGuruTable = () => {
                                             </tr>
                                             <tr>
                                                 <td className="font-normal">Waktu</td>
-                                                <td className="font-normal">: {record.time}</td>
+                                                <td className="font-normal">: {moment(record.date).format('HH:mm')}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -242,11 +236,15 @@ const AbsensiGuruTable = () => {
                                             </tr>
                                             <tr>
                                                 <td className="font-normal">Catatan</td>
-                                                <td className="font-normal">: {record.notes}</td>
+                                                <td className="font-normal">: {record.notes ? record.notes : "-"}</td>
                                             </tr>
                                             <tr>
                                                 <td className="font-normal">File</td>
-                                                <td className="font-normal">: <a href={record.fileUrl} target="_blank" rel="noopener noreferrer">Lihat File</a></td>
+                                                <td className="font-normal">
+                                                : {record.fileUrl ? (
+                                                    <a href={record.fileUrl} target="_blank" rel="noopener noreferrer">Lihat File</a>
+                                                    ) : "-"} {/* Menampilkan '-' jika fileUrl tidak ada */}
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -275,7 +273,7 @@ const AbsensiGuruTable = () => {
         <Fragment>
             <CmsTemplate>
                 <div>
-                    <h1 className="text-2xl font-semibold">Data Absensi Guru</h1>
+                    <h1 className="text-2xl font-semibold">Data Absensi Siswa</h1>
                     <div className="flex w-full justify-between mt-6 mb-4">
                         <div className="flex gap-4">
                             <Select
@@ -295,10 +293,24 @@ const AbsensiGuruTable = () => {
                                 format="YYYY-MM-DD"
                                 onChange={handleDateChange}
                             />
+                            <Select
+                                placeholder="Pilih Kelas"
+                                style={{ width: 120 }}
+                                onChange={handleClassChange} // Handle class change when user selects a value
+                                allowClear
+                            >
+                                {classOptions.map((classItem) => (
+                                    <Option key={classItem.id} value={classItem.id}>
+                                        {classItem.name}
+                                    </Option>
+                                ))}
+                            </Select>
+
                            
                         </div>
                         <div className="flex gap-2">
                             <Button
+                                    className="hidden"
                                     type="primary"
                                     icon={<DownloadOutlined />}
                                     onClick={handleDownloadReport}
@@ -353,54 +365,19 @@ const AbsensiGuruTable = () => {
                 {modalContent}
             </Modal>
 
-            <Modal
-                title="Download Report Absensi"
-                visible={isDownloadModalVisible}
-                onCancel={() => {
-                    setIsDownloadModalVisible(false);
-                }}
-                footer={null}
-            >
-                <div className="flex flex-col gap-4">
-                    <Select
-                        defaultValue={selectedYear}
-                        style={{ width: '100%' }}
-                        onChange={(value) => {
-                            console.log("Selected year: ", value);
-                            setSelectedYear(value);
-                        }}
-                    >
-                        {Array.from({ length: 5 }, (_, i) => moment().year() - i).map((year) => (
-                            <Option key={year} value={year}>{year}</Option>
-                        ))}
-                    </Select>
-                    <Select
-                        defaultValue={selectedMonth}
-                        style={{ width: '100%' }}
-                        onChange={(value) => {
-                            console.log("Selected month: ", value);
-                            setSelectedMonth(value);
-                        }}
-                    >
-                        {moment.months().map((month, index) => (
-                            <Option key={index + 1} value={index + 1}>{month}</Option>
-                        ))}
-                    </Select>
-                    <Button
-                        type="primary"
-                        onClick={() => {
-                            console.log(`Generating report for year: ${selectedYear}, month: ${selectedMonth}`);
-                            // Call API to generate report
-                        }}
-                    >
-                        Download Excel
-                    </Button>
-                </div>
-            </Modal>
 
+            {useModalDownload({
+                isDownloadModalVisible,
+                setIsDownloadModalVisible,
+                selectedYear,
+                setSelectedYear,
+                selectedMonth,
+                setSelectedMonth,
+            })}
+           
             {loading && <Loading />}
         </Fragment>
     );
 };
 
-export default AbsensiGuruTable;
+export default AbsensiSiswaTable;

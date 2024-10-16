@@ -89,14 +89,6 @@ const routes = [
   //   ),
   // },
   // {
-  //   path: "/cms/kelas",
-  //   element: (
-  //     <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN]}>
-  //       <Kelas />
-  //     </PrivateRoute>
-  //   ),
-  // },
-  // {
   //   path: "/cms/kuis",
   //   element: (
   //     <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
@@ -186,6 +178,14 @@ const routes = [
     element: (
       <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN]}>
         <MataPelajaran />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/cms/kelas",
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN]}>
+        <Kelas />
       </PrivateRoute>
     ),
   },
