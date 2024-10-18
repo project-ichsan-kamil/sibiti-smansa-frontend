@@ -174,7 +174,7 @@ const Absensi = () => {
         </div>
 
         {/* Tombol Absen */}
-        <div className="flex-shrink-0 p-4 bg-white shadow rounded-lg w-full">
+        <div className="flex-shrink-0 p-4 bg-white shadow rounded-lg w-full static bottom-0">
           <div className="flex items-center justify-between">
             <div>
               <div>
