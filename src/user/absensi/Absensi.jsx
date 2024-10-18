@@ -152,7 +152,7 @@ const Absensi = () => {
 
   return (
     <UserTemplate>
-      <div className="flex flex-col relative -m-3 h-[calc(100vh-70px)]">
+      <div className="flex flex-col relative -m-3 h-[calc(100vh-150px)]">
 
         {/* Status Akurasi Lokasi */}
         {!todayStatus && (
@@ -174,7 +174,7 @@ const Absensi = () => {
         </div>
 
         {/* Tombol Absen */}
-        <div className="flex-shrink-0 p-4 bg-white shadow rounded-lg w-full static bottom-0">
+        <div className="flex-shrink-0 p-4 bg-white shadow rounded-lg w-full fixed bottom-0">
           <div className="flex items-center justify-between">
             <div>
               <div>
