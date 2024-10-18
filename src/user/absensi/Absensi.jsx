@@ -147,11 +147,11 @@ const Absensi = () => {
 
   return (
     <UserTemplate>
-      <div className="flex flex-col h-screen relative -m-2" style={{ height: 'calc(100vh - 5em)' }}>
+      <div className="flex flex-col relative -m-3 h-[calc(100vh-70px)]">
 
         {/* Status Akurasi Lokasi */}
         {!todayStatus && (
-          <div className={`absolute top-2 left-1/2 transform -translate-x-1/2 z-50 p-2 text-center lg:w-7/12 w-10/12 text-sm rounded-lg text-white ${statusBgColor}`}>
+          <div className={`absolute top-2 left-1/2 transform -translate-x-1/2 z-40 p-2 text-center lg:w-7/12 w-10/12 text-sm rounded-lg text-white ${statusBgColor}`}>
             {locationStatus}
           </div>
         )}
@@ -161,7 +161,7 @@ const Absensi = () => {
           <iframe
             src={`https://www.google.com/maps?q=${position[0]},${position[1]}&z=15&output=embed`}
             width="100%"
-            className="h-full"
+            className="h-[100%]"
             allowFullScreen=""
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

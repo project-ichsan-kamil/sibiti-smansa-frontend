@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import image from '../../assets/UserImage';
 import Utils from '../../utils/Utils';
 import { showErrorNotification, showSuccessNotification } from '../../components/template/Notification';
@@ -6,6 +7,7 @@ import Loading from '../../components/template/Loading';
 import api from '../../config/axios';
 
 const ForgotPassword = () => {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const {showLoading, hideLoading, loading} = Utils()
@@ -88,12 +90,18 @@ const ForgotPassword = () => {
               </div>
               {error && <p className="text-red-500 text-xs">{error}</p>}
             </div>
-            <div>
+            <div className='space-y-2'>
               <button
                 type="submit"
                 className="w-full py-2 px-4 bg-active hover:bg-hover text-white font-normal rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Kirim Email
+              </button>
+              <button
+                onClick={() => navigate("/")}
+                className="w-full py-2 px-4 bg-white border border-active text-active hover:bg-active hover:text-white font-normal rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Login
               </button>
             </div>
           </form>
