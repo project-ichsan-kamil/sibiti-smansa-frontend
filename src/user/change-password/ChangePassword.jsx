@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import image from '../../assets/UserImage';
 import api from '../../config/axios'; // Pastikan untuk mengimpor axios
 import { useParams } from 'react-router-dom';
@@ -9,6 +10,7 @@ import Loading from '../../components/template/Loading';
 
 const ChangePassword = () => {
   const { token } = useParams(); 
+  const navigate = useNavigate()
   const {showLoading, hideLoading, loading} = Utils()
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -187,12 +189,18 @@ const ChangePassword = () => {
               {errorConfirmPassword && <p className="text-red-500 text-xs">{errorConfirmPassword}</p>}
             </div>
 
-            <div>
+            <div className='space-y-2'>
               <button
                 type="submit"
                 className="w-full py-2 px-4 bg-active hover:bg-hover text-white font-normal rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Buat Password Baru
+              </button>
+              <button
+                onClick={() => navigate("/")}
+                className="w-full py-2 px-4 bg-white border border-active text-active hover:bg-active hover:text-white font-normal rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Login
               </button>
             </div>
           </form>
