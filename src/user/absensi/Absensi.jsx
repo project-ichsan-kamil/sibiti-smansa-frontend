@@ -27,8 +27,13 @@ const Absensi = () => {
   const [todayDate, setTodayDate] = useState('');
   const [todayTime, setTodayTime] = useState('')
 
+  //PRODLIKE & DEVELOPMENT
   const CENTER_COORDS = { latitude: -6.129823, longitude: 106.879966 };
-  const RADIUS = 300; // Radius 300 meter
+
+  //PRODUCTION
+  // const CENTER_COORDS = { latitude: -0.225094, longitude: 100.655223 };
+
+  const RADIUS = 200; // Radius 200 meter
 
   const getLocation = () => {
     if ('geolocation' in navigator) {
@@ -159,9 +164,9 @@ const Absensi = () => {
         {/* Peta Google Maps */}
         <div className="flex-grow">
           <iframe
-            src={`https://www.google.com/maps?q=${position[0]},${position[1]}&z=15&output=embed`}
+            src={`https://www.google.com/maps?q=${position[0]},${position[1]}&z=18&output=embed`}
             width="100%"
-            className="h-[100%]"
+            className="h-full"
             allowFullScreen=""
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
