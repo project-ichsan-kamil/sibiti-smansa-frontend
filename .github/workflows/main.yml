@@ -60,7 +60,7 @@ jobs:
           if pm2 list | grep -q "smansa-prodlike-frontend"; then
             pm2 restart smansa-prodlike-frontend;
           else
-            pm2 start npm --name smansa-prodlike-frontend -- run start;
+            pm2 start npm --name smansa-prodlike-frontend -- run preview -- --port 5173;
           fi
           pm2 save; # Simpan konfigurasi PM2 untuk memastikan proses otomatis di-restart setelah server reboot
         '
