@@ -30,10 +30,6 @@ jobs:
       run: |
         npm ci
 
-    - name: Build project
-      run: |
-        npm run build
-
     - name: Deploy to Server
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_PRODLIKE }}
@@ -45,9 +41,6 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H "$SERVER" >> ~/.ssh/known_hosts
 
-        # Masuk ke folder mathbot dan transfer hanya file hasil build menggunakan rsync
-           rsync -avz --delete --exclude='node_modules' --exclude='.git' dist/ package.json package-lock.json $USERNAME@$SERVER:~/sibiti-frontend
-         
     - name: Restart PM2
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_PRODLIKE }}
@@ -56,11 +49,11 @@ jobs:
         
       run: |
         ssh $USERNAME@$SERVER '
-          cd ~/sibiti-frontend;
+          cd ~/sibiti-smansa-frontend;
           if pm2 list | grep -q "smansa-prodlike-frontend"; then
             pm2 restart smansa-prodlike-frontend;
           else
-            pm2 start npm --name smansa-prodlike-frontend -- run preview -- --port 5173;
+            pm2 start npm --name smansa-prodlike-frontend -- start -- --port 5173;
           fi
           pm2 save; # Simpan konfigurasi PM2 untuk memastikan proses otomatis di-restart setelah server reboot
         '
