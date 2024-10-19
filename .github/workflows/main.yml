@@ -62,3 +62,4 @@ jobs:
             pm2 start npm --name smansa-prodlike-frontend -- run start;
           fi
           pm2 save; # Simpan konfigurasi PM2 untuk memastikan proses otomatis di-restart setelah server reboot
+      '
