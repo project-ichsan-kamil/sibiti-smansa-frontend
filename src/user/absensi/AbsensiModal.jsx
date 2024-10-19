@@ -20,7 +20,6 @@ const AbsensiModal = ({ visible, onClose, currentDate, currentTime, status, setS
       centered
       onCancel={onClose}
       footer={null}
-      bodyStyle={{ padding: '24px' }}
     >
       {/* Date and Time Display */}
       <div className="mb-4 text-gray-500">
@@ -50,8 +49,8 @@ const AbsensiModal = ({ visible, onClose, currentDate, currentTime, status, setS
             className="w-full"
           >
             <Select.Option value="PRESENT">HADIR</Select.Option>
-            <Select.Option value="EXCUSED">IZIN</Select.Option>
-            <Select.Option value="SICK">SAKIT</Select.Option>
+            {/* <Select.Option value="EXCUSED">IZIN</Select.Option>
+            <Select.Option value="SICK">SAKIT</Select.Option> */}
           </Select>
         </Form.Item>
 
@@ -74,7 +73,7 @@ const AbsensiModal = ({ visible, onClose, currentDate, currentTime, status, setS
             <Form.Item
               label="Lampiran"
               required
-              rules={[{ required: true, message: 'Bukti gambar harus di-upload!' }]}
+              rules={[{ required: true, message: 'Bukti file harus di-upload!' }]}
             >
               <Upload
                 beforeUpload={(file) => {
@@ -83,7 +82,7 @@ const AbsensiModal = ({ visible, onClose, currentDate, currentTime, status, setS
                 }}
                 accept="*/*"
               >
-                <Button icon={<UploadOutlined />}>Pilih Gambar</Button>
+                <Button icon={<UploadOutlined />}>Pilih file</Button>
               </Upload>
             </Form.Item>
           </>
