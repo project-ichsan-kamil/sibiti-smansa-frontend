@@ -28,12 +28,12 @@ const Absensi = () => {
   const [todayTime, setTodayTime] = useState('')
 
   //PRODLIKE & DEVELOPMENT
-  const CENTER_COORDS = { latitude: -6.129823, longitude: 106.879966 };
+  // const CENTER_COORDS = { latitude: -6.129823, longitude: 106.879966 };
 
   //PRODUCTION
-  // const CENTER_COORDS = { latitude: -0.225094, longitude: 100.655223 };
+  const CENTER_COORDS = { latitude: -0.225094, longitude: 100.655223 };
 
-  const RADIUS = 200; // Radius 200 meter
+  const RADIUS = 250; // Radius 250 meter
 
   const getLocation = () => {
     if ('geolocation' in navigator) {
