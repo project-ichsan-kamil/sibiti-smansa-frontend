@@ -53,6 +53,7 @@ jobs:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_PRODLIKE }}
         SERVER: ${{ secrets.PRODLIKE_SERVER }} # Mengambil server IP dari GitHub Secrets
         USERNAME: ${{ secrets.PRODLIKE_USERNAME }}
+        
       run: |
         ssh $USERNAME@$SERVER '
           cd ~/sibiti-frontend;
@@ -62,4 +63,6 @@ jobs:
             pm2 start npm --name smansa-prodlike-frontend -- run start;
           fi
           pm2 save; # Simpan konfigurasi PM2 untuk memastikan proses otomatis di-restart setelah server reboot
-      '
+        '
+
+      
