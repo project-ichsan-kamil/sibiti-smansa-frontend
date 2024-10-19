@@ -27,8 +27,13 @@ const Absensi = () => {
   const [todayDate, setTodayDate] = useState('');
   const [todayTime, setTodayTime] = useState('')
 
+  //PRODLIKE & DEVELOPMENT
   const CENTER_COORDS = { latitude: -6.129823, longitude: 106.879966 };
-  const RADIUS = 300; // Radius 300 meter
+
+  //PRODUCTION
+  // const CENTER_COORDS = { latitude: -0.225094, longitude: 100.655223 };
+
+  const RADIUS = 200; // Radius 200 meter
 
   const getLocation = () => {
     if ('geolocation' in navigator) {
@@ -147,11 +152,11 @@ const Absensi = () => {
 
   return (
     <UserTemplate>
-      <div className="flex flex-col h-screen relative -m-2" style={{ height: 'calc(100vh - 5em)' }}>
+      <div className="flex flex-col relative -m-3 h-[calc(100vh-150px)] lg:h-[calc(100vh-70px)]">
 
         {/* Status Akurasi Lokasi */}
         {!todayStatus && (
-          <div className={`absolute top-2 left-1/2 transform -translate-x-1/2 z-50 p-2 text-center lg:w-7/12 w-10/12 text-sm rounded-lg text-white ${statusBgColor}`}>
+          <div className={`absolute top-2 left-1/2 transform -translate-x-1/2 z-40 p-2 text-center lg:w-7/12 w-10/12 text-sm rounded-lg text-white ${statusBgColor}`}>
             {locationStatus}
           </div>
         )}
@@ -159,7 +164,7 @@ const Absensi = () => {
         {/* Peta Google Maps */}
         <div className="flex-grow">
           <iframe
-            src={`https://www.google.com/maps?q=${position[0]},${position[1]}&z=15&output=embed`}
+            src={`https://www.google.com/maps?q=${position[0]},${position[1]}&z=18&output=embed`}
             width="100%"
             className="h-full"
             allowFullScreen=""
@@ -169,7 +174,7 @@ const Absensi = () => {
         </div>
 
         {/* Tombol Absen */}
-        <div className="flex-shrink-0 p-4 bg-white shadow rounded-lg w-full">
+        <div className="flex-shrink-0 p-4 bg-white shadow rounded-lg w-full lg:static fixed bottom-0">
           <div className="flex items-center justify-between">
             <div>
               <div>

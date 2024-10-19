@@ -14,16 +14,22 @@ const PrivateRoute = ({ children, allowedRoles }) => {
   useEffect(() => {
     api.get(AUTH_API.authMe)
       .then((response) => {
+        console.log("Log response form get auth");
+        console.log(response);
         setIsAuthenticated(true);
         setUserRoles(response.data.roles || []);
-        setCurrentUser({ ...currentUser, fullName: response.data.fullName, roles: response.data.roles });
+        setCurrentUser({ ...currentUser, fullName: response.data.fullName, roles: response.data.roles, fotoProfile: response.data.fotoProfile });
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log("error auth");
+        console.log(err);
         setIsAuthenticated(false);
       })
       .finally(() => {
         setIsLoading(false);
       });
+    
+    console.log(isAuthenticated);
   }, []);
 
   if (isLoading) {

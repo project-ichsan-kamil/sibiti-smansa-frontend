@@ -47,6 +47,8 @@ const NavbarAdmin = () => {
             }
         } else if (key === "profile") {
             navigate("/profile");
+        } else if(key === "user-page"){
+            navigate("/absensi")
         } else if (key === "logout") {
             handleLogout();
         }
@@ -54,15 +56,17 @@ const NavbarAdmin = () => {
 
     const menu = (
         <Menu onClick={handleMenuClick}>
-            <Menu.Item key="dashboard">Dashboard</Menu.Item>
-            <Menu.Item key="profile">Profile</Menu.Item>
+            {/* TODO un hide */}
+            {/* <Menu.Item key="dashboard">Dashboard</Menu.Item>
+            <Menu.Item key="profile">Profile</Menu.Item> */}
+            <Menu.Item key="user-page">User Page</Menu.Item>
             <Menu.Item key="logout">Logout</Menu.Item>
         </Menu>
     );
 
     return (
         <Fragment>
-            <Header className="bg-purple-700 flex justify-between items-center w-full">
+            <Header className="bg-active flex justify-between items-center w-full">
                 <div>
                     <h1 className="text-white text-2xl font-semibold">
                         Smansa
@@ -101,9 +105,19 @@ const NavbarAdmin = () => {
                                         marginBottom: "0",
                                     }}
                                 >
-                                    {currentUser.roles === Roles.SUPER_ADMIN
-                                        ? "SUPER ADMIN"
-                                        : currentUser.roles}
+                                    {(() => {
+                                            const roles = currentUser.roles; // Pastikan roles adalah array
+                                            if (roles.includes("SUPER_ADMIN")) {
+                                                return "SUPER ADMIN";
+                                            } else if (roles.includes("ADMIN")) {
+                                                return "ADMIN";
+                                            } else if (roles.includes("GURU")) {
+                                                return "GURU";
+                                            } else {
+                                                return "No Role"; // Atau nilai default lainnya
+                                            }
+                                        })()
+                                    }
                                 </p>
                             </div>
                         </div>
