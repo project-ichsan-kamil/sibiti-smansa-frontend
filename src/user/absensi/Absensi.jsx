@@ -31,9 +31,9 @@ const Absensi = () => {
   // const CENTER_COORDS = { latitude: -6.129823, longitude: 106.879966 };
 
   //PRODUCTION
-  const CENTER_COORDS = { latitude: -0.225094, longitude: 100.655223 };
+  const CENTER_COORDS = { latitude: -0.224933, longitude: 100.655450 };
 
-  const RADIUS = 100; // Radius 100 meter
+  const RADIUS = 75; // Radius 100 meter
 
   const getLocation = () => {
     if ('geolocation' in navigator) {
