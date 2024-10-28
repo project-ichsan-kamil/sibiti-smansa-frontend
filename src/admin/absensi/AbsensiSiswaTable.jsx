@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { Table, Input, Tag, Select, Button, Modal, DatePicker } from "antd";
+import { Table, Input, Tag, Select, Button, Modal, DatePicker, Tabs } from "antd";
 import { EyeOutlined, DownloadOutlined } from '@ant-design/icons';
 import Loading from "../../components/template/Loading";
 import Utils from "../../utils/Utils";
@@ -11,9 +11,11 @@ import api from "../../config/axios";
 
 const { Search } = Input;
 const { Option } = Select;
+const { TabPane } = Tabs; 
 
 const AbsensiSiswaTable = () => {
     const [attendanceData, setAttendanceData] = useState([]);
+    const [studentsWithoutAttendance, setStudentsWithoutAttendance] = useState([]); 
     const { showLoading, hideLoading, loading } = Utils();
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -28,26 +30,37 @@ const AbsensiSiswaTable = () => {
     const [classOptions, setClassOptions] = useState([]); 
     const [selectedClassId, setSelectedClassId] = useState(null);
 
-    useEffect(() => {
-        // Initial fetch of attendance data
-        fetchClasses();
-        // fetchAttendanceData();
-        fetchAttendanceData(selectedDate, selectedClassId);
+    const [activeTab, setActiveTab] = useState("attendance"); // Tambahkan state untuk melacak tab yang aktif
 
-        // Set interval to refetch data every 5 minutes
+    useEffect(() => {
+        fetchClasses();
+    }, []); 
+    
+    useEffect(() => {    
+        if (activeTab === "attendance") {
+            fetchAttendanceData(selectedDate, selectedClassId);
+        } else if (activeTab === "notPresent") {
+            fetchStudentsWithoutAttendance(selectedDate, selectedClassId);
+        }
+    
+        // Set interval to refetch data every 5 minutes for the active tab only
         const interval = setInterval(() => {
             const currentMinute = moment().minute();
-            console.log(`Current minute: ${currentMinute}`);
             if (currentMinute % 5 === 0) {
-                console.log("Fetching attendance data on 5-minute interval");
-                fetchAttendanceData();
+                if (activeTab === "attendance") {
+                    fetchAttendanceData();
+                } else if (activeTab === "notPresent") {
+                    fetchStudentsWithoutAttendance();
+                }
             }
         }, 60000); // Check every minute
+    
         return () => clearInterval(interval);
-    }, []);;
+    }, [activeTab, selectedDate, selectedClassId]); // Tambahkan dependency activeTab, selectedDate, dan selectedClassId
+    
 
     const fetchAttendanceData = async (date, classId) => {
-        console.log("Fetching attendance data...");
+        if (activeTab !== "attendance") return; 
         showLoading();
 
         // Construct API parameters object
@@ -59,13 +72,12 @@ const AbsensiSiswaTable = () => {
             params.date = selectedDate; // fallback to the default state value if no date is provided
         }
 
-        // Add classId only if it's selected (not null or undefined)
         if (classId) {
             params.classId = classId;
         }
 
         try {
-            const response = await api.get('/absents/students', { params });
+            const response = await api.get('/absents/students', { params });            
             const data = response.data.data; // Adjust according to your response structure
             console.log("Attendance data fetched successfully", data);
             setAttendanceData(data);
@@ -73,6 +85,35 @@ const AbsensiSiswaTable = () => {
         } catch (e) {
             console.error("Error fetching attendance data: ", e);
             showErrorNotification(e, "Gagal mengambil data absensi");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    const fetchStudentsWithoutAttendance = async (date, classId) => {
+        if (activeTab !== "notPresent") return;
+        showLoading();
+
+        const params = {};
+
+        if (date) {
+            params.date = date;
+        } else {
+            params.date = selectedDate; 
+        }
+
+        if (classId) {
+            params.classId = classId;
+        }
+
+        try {
+            const response = await api.get('/absents/students-without-absents', { params });
+            const data = response.data.data;
+            console.log("Students without attendance fetched", data);
+            setStudentsWithoutAttendance(data);
+        } catch (e) {
+            console.error("Error fetching students without attendance: ", e);
+            showErrorNotification(e, "Gagal mengambil data siswa belum absen");
         } finally {
             hideLoading();
         }
@@ -92,28 +133,37 @@ const AbsensiSiswaTable = () => {
     };
     
     const searchAttendance = (value) => {
-        console.log(`Searching attendance with value: ${value}`);
-        if (value) {
-            // Filter attendance data based on the input value
-            const filteredData = attendanceData.filter((item) =>
-                item.fullName && item.fullName.toLowerCase().includes(value.toLowerCase())
-            );
-            console.log("Filtered attendance data: ", filteredData);
-            setAttendanceData(filteredData);
-        } else {
-            // If input is cleared, refetch the original data
-            fetchAttendanceData(selectedDate, selectedClassId);
+
+        setCurrentPage(1);
+        // Cek apakah tab yang aktif adalah "Sudah Absen" atau "Belum Absen"
+        if (activeTab === "attendance") {
+            // Filter data kehadiran (attendanceData)
+            if (value) {
+                const filteredData = attendanceData.filter((item) =>
+                    item.fullName && item.fullName.toLowerCase().includes(value.toLowerCase())
+                );
+                setAttendanceData(filteredData);
+            } else {
+                // Jika input dihapus, ambil ulang data asli
+                fetchAttendanceData(selectedDate, selectedClassId);
+            }
+        } else if (activeTab === "notPresent") {
+            // Filter data siswa yang belum absen (studentsWithoutAttendance)
+            if (value) {
+                const filteredData = studentsWithoutAttendance.filter((item) =>
+                    item.fullName && item.fullName.toLowerCase().includes(value.toLowerCase())
+                );
+                setStudentsWithoutAttendance(filteredData);
+            } else {
+                // Jika input dihapus, ambil ulang data asli
+                fetchStudentsWithoutAttendance(selectedDate, selectedClassId);
+            }
         }
-    };
+    };  
 
     const handleDateChange = (date, dateString) => {
-        console.log("Date changed: ", dateString);
-    
-        // Jika dateString kosong (misalnya ketika dihapus), set default ke hari ini
         const selectedDateValue = dateString ? dateString : moment().format('YYYY-MM-DD');
-        
         setSelectedDate(selectedDateValue);
-        fetchAttendanceData(selectedDateValue);  // Panggil fetch dengan tanggal yang telah disesuaikan
     };
     
 
@@ -124,14 +174,14 @@ const AbsensiSiswaTable = () => {
     };
 
     const handleClassChange = (value) => {
-        console.log("Class changed: ", value);
         setSelectedClassId(value);
-
-        // Fetch attendance data immediately with the new classId
-        fetchAttendanceData(selectedDate, value);
     };
 
-    // Define the table columns
+    const handleTabChange = (key) => {
+        setActiveTab(key); // Update tab yang aktif
+    };
+    
+
     const columns = [
         {
             title: "No",
@@ -269,6 +319,46 @@ const AbsensiSiswaTable = () => {
         },
     ];
 
+    const columnsWithoutAbsents = [
+        {
+            title: "No",
+            dataIndex: "id",
+            width: "5%",
+            align: "center",
+            render: (text, record, index) =>
+                index + 1 + (currentPage - 1) * pageSize,
+        },
+        {
+            title: "Nama",
+            dataIndex: "fullName",
+            key: "fullName",
+            width: "20%",
+        },
+        {
+            title: "Kelas",
+            dataIndex: "className",
+            width: "10%",
+        },
+        {
+            title: "Status",
+            dataIndex: "status",
+            width: "10%",
+            render: (status) => (
+                <Tag
+                    color={"red"}
+                >
+                    {"Belum Absen"}
+                </Tag>
+            ),
+        },
+        {
+            title: "Tanggal",
+            dataIndex: "date",
+            width: "15%",
+            render: (date) => new Date(date).toLocaleDateString(),
+        },
+    ];
+
     return (
         <Fragment>
             <CmsTemplate>
@@ -334,22 +424,41 @@ const AbsensiSiswaTable = () => {
                         <p>Data ini terakhir diambil pada: {lastFetchedTime ? moment(lastFetchedTime).format('HH:mm:ss') : 'Belum ada data'}</p>
                     </div>
 
-                    <Table
-                        columns={columns}
-                        dataSource={attendanceData}
-                        pagination={{
-                            current: currentPage,
-                            pageSize: pageSize,
-                            onChange: (page, pageSize) => {
-                                console.log("Page changed: ", page, "Page size: ", pageSize);
-                                setCurrentPage(page);
-                                setPageSize(pageSize);
-                            },
-                            showSizeChanger: false,
-                            position: ["bottomCenter"],
-                        }}
-                        size="small"
-                    />
+                     <Tabs defaultActiveKey="attendance" onChange={handleTabChange}>
+                        <TabPane tab="Sudah Absen" key="attendance">
+                            <Table
+                                columns={columns}
+                                dataSource={attendanceData}
+                                pagination={{
+                                    current: currentPage,
+                                    pageSize: pageSize,
+                                    onChange: (page, pageSize) => {
+                                        setCurrentPage(page);
+                                        setPageSize(pageSize);
+                                    },
+                                    position: ["bottomCenter"],
+                                }}
+                                size="small"
+                            />
+                        </TabPane>
+
+                        <TabPane tab="Belum Absen" key="notPresent">
+                        <Table
+                                columns={columnsWithoutAbsents}
+                                dataSource={studentsWithoutAttendance}
+                                pagination={{
+                                    current: currentPage,
+                                    pageSize: pageSize,
+                                    onChange: (page, pageSize) => {
+                                        setCurrentPage(page);
+                                        setPageSize(pageSize);
+                                    },
+                                    position: ["bottomCenter"],
+                                }}
+                                size="small"
+                            />
+                        </TabPane>
+                    </Tabs>
                 </div>
             </CmsTemplate>
 
