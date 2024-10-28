@@ -44,20 +44,23 @@ const Navbar = ({ toggleSidebar }) => {
   };
 
   const hasProfileImage = currentUser.fotoProfile && currentUser.fotoProfile.trim() !== '';
-    const profileImage = hasProfileImage ? currentUser.fotoProfile : '';
+  const profileImage = hasProfileImage ? currentUser.fotoProfile : '';
 
-    // Ambil inisial dari nama lengkap
-    const getInitials = (name) => {
-        const names = name.split(' ');
-        // Jika hanya satu kata, ambil huruf pertamanya
-        if (names.length === 1) {
-            return names[0].charAt(0).toUpperCase();
-        }
-        // Jika lebih dari satu kata, ambil huruf pertama dari nama depan dan belakang
+  const getInitials = (name) => {
+    const names = name.split(' ');
+    
+    if (names.length === 1) {
+        return names[0].charAt(0).toUpperCase();
+    }
+    
+    if (names.length === 2) {
         return names.map(n => n.charAt(0).toUpperCase()).join('');
-    };
+    }
+    
+      return names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase();
+  };
 
-    const initials = getInitials(currentUser.fullName);
+  const initials = getInitials(currentUser.fullName);
 
   return (
     <div className="flex items-center justify-between p-3 lg:px-20 bg-default shadow-sm">
