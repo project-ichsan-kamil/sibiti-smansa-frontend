@@ -162,6 +162,7 @@ const AbsensiSiswaTable = () => {
     };  
 
     const handleDateChange = (date, dateString) => {
+        setCurrentPage(1);
         const selectedDateValue = dateString ? dateString : moment().format('YYYY-MM-DD');
         setSelectedDate(selectedDateValue);
     };
@@ -174,6 +175,7 @@ const AbsensiSiswaTable = () => {
     };
 
     const handleClassChange = (value) => {
+        setCurrentPage(1);
         setSelectedClassId(value);
     };
 

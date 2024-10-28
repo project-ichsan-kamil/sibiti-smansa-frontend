@@ -94,6 +94,7 @@ const AbsensiGuruTable = () => {
     };
 
     const handleDateChange = (date, dateString) => {
+        setCurrentPage(1);
         // Jika dateString kosong (misalnya ketika dihapus), set default ke hari ini
         const selectedDateValue = dateString ? dateString : moment().format('YYYY-MM-DD');
         setSelectedDate(selectedDateValue);
@@ -108,6 +109,7 @@ const AbsensiGuruTable = () => {
     };
 
     const handleSearchChange = (e) => {
+        setCurrentPage(1);
         setSearchText(e.target.value);
     };
 
