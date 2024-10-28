@@ -436,6 +436,7 @@ const AbsensiSiswaTable = () => {
                                         setCurrentPage(page);
                                         setPageSize(pageSize);
                                     },
+                                    showSizeChanger: false,
                                     position: ["bottomCenter"],
                                 }}
                                 size="small"
@@ -453,6 +454,7 @@ const AbsensiSiswaTable = () => {
                                         setCurrentPage(page);
                                         setPageSize(pageSize);
                                     },
+                                    showSizeChanger: false,
                                     position: ["bottomCenter"],
                                 }}
                                 size="small"
