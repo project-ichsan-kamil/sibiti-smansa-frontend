@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { Table, Input, Tag, Select, Button, Modal, DatePicker } from "antd";
+import { Table, Input, Tag, Select, Button, Modal, DatePicker, Tabs } from "antd";
 import { EyeOutlined, DownloadOutlined } from '@ant-design/icons';
 import Loading from "../../components/template/Loading";
 import Utils from "../../utils/Utils";
@@ -11,9 +11,11 @@ import api from "../../config/axios";
 
 const { Search } = Input;
 const { Option } = Select;
+const { TabPane } = Tabs;
 
 const AbsensiGuruTable = () => {
     const [attendanceData, setAttendanceData] = useState([]);
+    const [teachersWithoutAbsents, setTeachersWithoutAbsents] = useState([]);
     const { showLoading, hideLoading, loading } = Utils();
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -25,11 +27,13 @@ const AbsensiGuruTable = () => {
     const [selectedYear, setSelectedYear] = useState(moment().year());
     const [selectedMonth, setSelectedMonth] = useState(moment().month() + 1);
     const [searchText, setSearchText] = useState("");
+    const [activeTab, setActiveTab] = useState("1"); 
 
     useEffect(() => {
         console.log("Initial fetch of attendance data");
         // Initial fetch of attendance data
         fetchAttendanceData();
+        fetchTeachersWithoutAbsents();
         // Set interval to refetch data every 5 minutes
         const interval = setInterval(() => {
             const currentMinute = moment().minute();
@@ -37,6 +41,7 @@ const AbsensiGuruTable = () => {
             if (currentMinute % 5 === 0) {
                 console.log("Fetching attendance data on 5-minute interval");
                 fetchAttendanceData();
+                fetchTeachersWithoutAbsents();
             }
         }, 60000); // Check every minute
         return () => clearInterval(interval);
@@ -68,14 +73,32 @@ const AbsensiGuruTable = () => {
         }
     };
 
-    const handleDateChange = (date, dateString) => {
-        console.log("Date changed: ", dateString);
+    const fetchTeachersWithoutAbsents = async (date) => {
+        console.log("Fetching teachers without absents...");
+        showLoading();
 
+        const dateParam = date || selectedDate;
+        try {
+            const response = await api.get('/absents/teachers-without-absents', {
+                params: { date: dateParam },
+            });
+            const data = response.data.data;
+            console.log(data);
+            setTeachersWithoutAbsents(data);
+        } catch (e) {
+            console.error("Error fetching teachers without absents: ", e);
+            showErrorNotification(e, "Gagal mengambil data guru yang belum absen");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    const handleDateChange = (date, dateString) => {
         // Jika dateString kosong (misalnya ketika dihapus), set default ke hari ini
         const selectedDateValue = dateString ? dateString : moment().format('YYYY-MM-DD');
-        
         setSelectedDate(selectedDateValue);
         fetchAttendanceData(selectedDateValue);  // Panggil fetch dengan tanggal yang telah disesuaikan
+        fetchTeachersWithoutAbsents(selectedDateValue); 
     };
 
     // Function to handle download modal
@@ -88,7 +111,11 @@ const AbsensiGuruTable = () => {
         setSearchText(e.target.value);
     };
 
-    const filteredData = attendanceData.filter((item) =>
+    const filteredData = (attendanceData || []).filter((item) =>
+        item.fullName && item.fullName.toLowerCase().includes(searchText.toLowerCase())
+    );
+    
+    const filteredWithoutAbsentsData = (teachersWithoutAbsents || []).filter((item) =>
         item.fullName && item.fullName.toLowerCase().includes(searchText.toLowerCase())
     );
 
@@ -230,6 +257,46 @@ const AbsensiGuruTable = () => {
         },
     ];
 
+    const columnsWithoutAbsents = [
+        {
+            title: "No",
+            dataIndex: "id",
+            width: "5%",
+            align: "center",
+            render: (text, record, index) =>
+                index + 1 + (currentPage - 1) * pageSize,
+        },
+        {
+            title: "Nama",
+            dataIndex: "fullName",
+            key: "fullName",
+            width: "20%",
+        },
+        {
+            title: "Mata Pelajaran",
+            dataIndex: "subject",
+            width: "20%",
+        },
+        {
+            title: "Status",
+            dataIndex: "status",
+            width: "10%",
+            render: (status) => (
+                <Tag
+                    color={"red"}
+                >
+                    {"Belum Absen"}
+                </Tag>
+            ),
+        },
+        {
+            title: "Tanggal",
+            dataIndex: "date",
+            width: "15%",
+            render: (date) => new Date(date).toLocaleDateString(),
+        },
+    ];
+
     return (
         <Fragment>
             <CmsTemplate>
@@ -279,22 +346,42 @@ const AbsensiGuruTable = () => {
                         <p>Data ini terakhir diambil pada: {lastFetchedTime ? moment(lastFetchedTime).format('HH:mm:ss') : 'Belum ada data'}</p>
                     </div>
 
-                    <Table
-                        columns={columns}
-                        dataSource={filteredData}
-                        pagination={{
-                            current: currentPage,
-                            pageSize: pageSize,
-                            onChange: (page, pageSize) => {
-                                console.log("Page changed: ", page, "Page size: ", pageSize);
-                                setCurrentPage(page);
-                                setPageSize(pageSize);
-                            },
-                            showSizeChanger: false,
-                            position: ["bottomCenter"],
-                        }}
-                        size="small"
-                    />
+                     <Tabs activeKey={activeTab} onChange={(key) => setActiveTab(key)}>
+                        <TabPane tab="Sudah Absen" key="1">
+                            <Table
+                                columns={columns}
+                                dataSource={filteredData}
+                                pagination={{
+                                    current: currentPage,
+                                    pageSize: pageSize,
+                                    onChange: (page, pageSize) => {
+                                        setCurrentPage(page);
+                                        setPageSize(pageSize);
+                                    },
+                                    showSizeChanger: false,
+                                    position: ["bottomCenter"],
+                                }}
+                                size="small"
+                            />
+                        </TabPane>
+                        <TabPane tab="Belum Absen" key="2">
+                            <Table
+                                columns={columnsWithoutAbsents}
+                                dataSource={filteredWithoutAbsentsData}
+                                pagination={{
+                                    current: currentPage,
+                                    pageSize: pageSize,
+                                    onChange: (page, pageSize) => {
+                                        setCurrentPage(page);
+                                        setPageSize(pageSize);
+                                    },
+                                    showSizeChanger: false,
+                                    position: ["bottomCenter"],
+                                }}
+                                size="small"
+                            />
+                        </TabPane>
+                    </Tabs>
                 </div>
             </CmsTemplate>
 
