@@ -23,6 +23,7 @@ import AbsensiSiswa from "./admin/absensi/AbsensiSiswaTable";
 import AbsensiGuruTable from "./admin/absensi/AbsensiGuruTable";
 import KuisList from "./user/kuis/KuisList";
 import Ujian from "./user/ujian/Ujian";
+import IntroductionUjian from "./user/ujian/IntroductionUjian";
 
 const routes = [
   {
@@ -78,6 +79,15 @@ const routes = [
 
   //sub ujian
   {
+    path: "/ujian/start/:examId/:questionNumber",
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.SISWA]}>
+        <IntroductionUjian/>
+      </PrivateRoute>
+    ),
+  },
+
+  {
     path: "/ujian/:examId/:questionNumber",
     element: (
       <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.SISWA]}>
@@ -85,6 +95,7 @@ const routes = [
       </PrivateRoute>
     ),
   },
+
 
   //sub absensi cms
   {
