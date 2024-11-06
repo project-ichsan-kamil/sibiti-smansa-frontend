@@ -3,7 +3,6 @@ import Draggable from 'react-draggable';
 import { Layout, Button } from 'antd';
 import { ClockCircleOutlined, ArrowLeftOutlined, ArrowRightOutlined, MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import 'tailwindcss/tailwind.css';
-import UserTemplate from '../../components/template/user/UserTemplate';
 
 const { Content } = Layout;
 
@@ -85,9 +84,9 @@ const Ujian = () => {
         </div>
 
         <div className="rounded-lg">
-          <div className="p-2 rounded-lg mb-6">
+          <div className="p-2 rounded-lg mb-24">
             <h3 className="text-sm font-medium mb-3">Soal 1</h3>
-            <p className="mb-5 text-sm">Alveolus adalah bagian dari sistem pernapasan yang berfungsi untuk?</p>
+            <p className="mb-5 text-sm text-justify">Alveolus adalah bagian dari sistem pernapasan yang berfungsi untuk Alveolus adalah bagian dari sistem pernapasan yang berfungsi </p>
             
             {/* Custom Radio Buttons */}
             <div className="w-full space-y-3">
@@ -107,18 +106,18 @@ const Ujian = () => {
                     checked={selectedValue === value}
                     onChange={() => {}}
                   />
-                  Menyaring udara dari kotoran {/* Ubah teks sesuai dengan kebutuhan */}
+                  <span className="font-medium mr-2">{String.fromCharCode(65 + index)}.</span>
+                  Menyaring udara dari kotoran 
                 </label>
               ))}
             </div>
           </div>
 
-          <div className="flex justify-between items-center">
+          <div className="fixed bottom-0 pb-8 left-0 w-full py-2 px-4 flex justify-between items-center bg-default z-20">
             <Button icon={<ArrowLeftOutlined />} className="bg-gray-200 text-gray-600 hover:bg-gray-300">
             </Button>
 
-            {/* Checkbox for "Ragu-Ragu" */}
-            <label className="flex items-center cursor-pointer text-sm">
+            <label className="flex items-center cursor-pointer text-sm text-active">
               <input type="checkbox" className="w-4 h-4 mr-2" />
               Ragu-Ragu
             </label>
@@ -126,6 +125,7 @@ const Ujian = () => {
             <Button icon={<ArrowRightOutlined />} className="bg-gray-200 text-gray-600 hover:bg-gray-300">
             </Button>
           </div>
+
 
           <div className="flex justify-end mt-6 hidden">
             <Button type="primary" className="bg-blue-500 hover:bg-blue-600">
