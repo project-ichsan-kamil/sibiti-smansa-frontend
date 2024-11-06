@@ -22,6 +22,7 @@ import RiwayatAbsensi from "./user/riwayat-absen/RiwayatAbsensi";
 import AbsensiSiswa from "./admin/absensi/AbsensiSiswaTable";
 import AbsensiGuruTable from "./admin/absensi/AbsensiGuruTable";
 import KuisList from "./user/kuis/KuisList";
+import Ujian from "./user/ujian/Ujian";
 
 const routes = [
   {
@@ -66,12 +67,24 @@ const routes = [
   {
     path: "/kuis",
     element: (
-      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU, Roles.SISWA]}>
+      // TODO only role siswa
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU, Roles.SISWA]}>  
         <KuisList/>
       </PrivateRoute>
     ),
   },
   
+
+
+  //sub ujian
+  {
+    path: "/ujian/:examId/:questionNumber",
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.SISWA]}>
+        <Ujian/>
+      </PrivateRoute>
+    ),
+  },
 
   //sub absensi cms
   {
