@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Tag } from "antd";
+import { Modal, Tag, Tooltip, message } from "antd";
 
 
 const KuisDetailModal = ({ visible, onClose, kuis }) => {
@@ -32,6 +32,11 @@ const KuisDetailModal = ({ visible, onClose, kuis }) => {
                 return "default";
         }
     };
+
+    const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text);
+        message.success(`"${text}" copied to clipboard!`);
+      };
 
     return (
         <Modal
@@ -137,7 +142,32 @@ const KuisDetailModal = ({ visible, onClose, kuis }) => {
                         {kuis.participants.map((participant, index) => (
                             <Tag key={index} color="default">{participant.name}</Tag>
                         ))}
-                        </div>                      
+                        </div>  
+                        <div className="flex justify-between">
+                            <strong>Link Ujian</strong>
+                            <span>:</span>
+                        </div>
+                        <Tooltip title="Click to copy">
+                            <div
+                            onClick={() => copyToClipboard(kuis.examURL)}
+                            className="cursor-pointer text-blue-500 hover:underline"
+                            >
+                            {kuis.examURL}
+                            </div>
+                        </Tooltip>
+
+                        <div className="flex justify-between">
+                            <strong>Passcode</strong>
+                            <span>:</span>
+                        </div>
+                        <Tooltip title="Click to copy">
+                            <div
+                            onClick={() => copyToClipboard(kuis.passcode)}
+                            className="cursor-pointer text-blue-500 hover:underline"
+                            >
+                            {kuis.passcode}
+                            </div>
+                        </Tooltip>            
                     </div>
                 </div>
                 {/* Custom Footer */}

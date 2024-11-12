@@ -79,7 +79,7 @@ const routes = [
 
   //sub ujian
   {
-    path: "/ujian/start/:examId/:questionNumber",
+    path: "/ujian/start/:examId",
     element: (
       <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.SISWA]}>
         <IntroductionUjian/>
@@ -88,7 +88,7 @@ const routes = [
   },
 
   {
-    path: "/ujian/:examId/:questionNumber",
+    path: "/ujian/progress/:examId/:questionNumber",
     element: (
       <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.SISWA]}>
         <Ujian/>
