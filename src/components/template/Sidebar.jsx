@@ -119,7 +119,7 @@ const Sidebar = () => {
       {
         key: '/cms/absensi/guru',
         label: <Link to="/cms/absensi/guru">Guru</Link>,
-        hide: !hasAnyRole([Roles.ADMIN, Roles.SUPER_ADMIN]), // Only accessible by SUPER_ADMIN and ADMIN
+        hide: !hasAnyRole([Roles.ADMIN, Roles.SUPER_ADMIN, Roles.GURU]), // Only accessible by SUPER_ADMIN and ADMIN
       },
       {
         key: '/cms/absensi/siswa',
