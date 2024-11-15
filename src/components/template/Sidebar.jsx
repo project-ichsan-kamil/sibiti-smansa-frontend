@@ -45,7 +45,7 @@ const Sidebar = () => {
       key: '/cms/kuis',
       icon: <AppstoreOutlined />,
       label: <Link to="/cms/kuis">Kuis</Link>,
-      hide: false,
+      hide: true,
     },
     {
       key: '/cms/ulangan-harian',

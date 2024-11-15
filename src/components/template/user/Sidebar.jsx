@@ -12,7 +12,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
     { path: '/dashboard', label: 'Dashboard', icon: <FaHome /> , hidden : true},
     { path: '/absensi', label: 'Absensi', icon: <FaUserCheck />, hidden: false},
     { path: '/riwayat-absensi', label: 'Riwayat Absensi', icon: <FaCalendar />, hidden: false},
-    { path: '/kuis', label: 'Kuis', icon: <FaClipboardList />, hidden: false },
+    { path: '/kuis', label: 'Kuis', icon: <FaClipboardList />, hidden: true },
     { path: '/ulangan-harian', label: 'Ulangan Harian', icon: <FaClipboardList />, hidden: true},
     { path: '/ujian-tengah-semester', label: 'Ujian Tengah Semester', icon: <FaCalendarAlt />, hidden: true},
     { path: '/ujian-akhir-semester', label: 'Ujian Akhir Semester', icon: <FaCalendarAlt />, hidden: true},
