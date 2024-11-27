@@ -24,6 +24,7 @@ import AbsensiGuruTable from "./admin/absensi/AbsensiGuruTable";
 import KuisList from "./user/kuis/KuisList";
 import Ujian from "./user/ujian/Ujian";
 import IntroductionUjian from "./user/ujian/IntroductionUjian";
+import SebDetailView from "./user/seb/SebDetailView";
 
 const routes = [
   {
@@ -92,6 +93,17 @@ const routes = [
     element: (
       <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.SISWA]}>
         <Ujian/>
+      </PrivateRoute>
+    ),
+  },
+
+
+  //SEB Detail
+  {
+    path: "/cms/seb-detail",
+    element: (
+      <PrivateRoute allowedRoles={[Roles.SUPER_ADMIN, Roles.ADMIN, Roles.GURU]}>
+        <SebDetailView/>
       </PrivateRoute>
     ),
   },

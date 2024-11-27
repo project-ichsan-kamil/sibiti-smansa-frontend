@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppstoreOutlined, LinkOutlined, MailOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, LinkOutlined, MailOutlined, KeyOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { useLocation, Link } from 'react-router-dom';
 import api from '../../config/axios';
@@ -47,6 +47,12 @@ const Sidebar = () => {
       label: <Link to="/cms/kuis">Kuis</Link>,
       hide: true,
     },
+    {
+      key: '/cms/seb-detail',  
+      icon: <KeyOutlined />,  
+      label: <Link to="/cms/seb-detail">SEB</Link>,  
+      hide: false, 
+  },
     {
       key: '/cms/ulangan-harian',
       icon: <AppstoreOutlined />,
