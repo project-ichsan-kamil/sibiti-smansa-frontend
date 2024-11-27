@@ -59,38 +59,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
               </li>
             ))}
           </ul>
-            {/* <li className="items-center space-x-2 text-sm font-semibold rounded-lg p-2 px-4 hover:bg-active hover:text-white transition-colors duration-300 hidden">  //TODO show
-              <FaHome />
-              <span>Dashboard</span>
-            </li>
-            <li className="flex items-center space-x-2 text-sm font-semibold p-2 px-4 hover:bg-active hover:text-white rounded-lg transition-colors duration-300">
-              <FaUserCheck />
-              <span>Absensi</span>
-            </li>
-            <li className="flex items-center space-x-2 text-sm font-semibold p-2 px-4 hover:bg-active hover:text-white rounded-lg transition-colors duration-300">
-              <FaClipboardList />
-              <span>Kuis</span>
-            </li>
-            <li className="flex items-center space-x-2 text-sm font-semibold p-2 px-4 hover:bg-active hover:text-white  rounded-lg transition-colors duration-300">
-              <FaClipboardList />
-              <span>Ulangan Harian</span>
-            </li>
-            <li className="flex items-center space-x-2 text-sm font-semibold p-2 px-4 hover:bg-active hover:text-white rounded-lg transition-colors duration-300">
-              <FaCalendarAlt />
-              <span>Ujian Tengah Semester</span>
-            </li>
-            <li className="flex items-center space-x-2 text-sm font-semibold p-2 px-4 hover:bg-active hover:text-white rounded-lg transition-colors duration-300">
-              <FaCalendarAlt />
-              <span>Ujian Akhir Semester</span>
-            </li>
-            <li className="flex items-center space-x-2 text-sm font-semibold p-2 px-4 hover:bg-active hover:text-white rounded-lg transition-colors duration-300">
-              <FaCalendar />
-              <span>Jadwal Ujian</span>
-            </li>
-            <li className="flex items-center space-x-2 text-sm font-semibold p-2 px-4 hover:bg-active hover:text-white rounded-lg transition-colors duration-300">
-              <FaBook />
-              <span>Bank Soal</span>
-            </li> */}
         </nav>
       </div>
     </div>
